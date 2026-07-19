@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-TEMPLATE_PATH = Path(__file__).with_name("template.json")
+TEMPLATE_PATH = Path(__file__).resolve().parents[1] / "templates" / "template.json"
 
 STANDARD_BOT_SCOPES = [
     "app_mentions:read",

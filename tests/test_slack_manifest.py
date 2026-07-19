@@ -6,10 +6,13 @@ import subprocess
 import sys
 from pathlib import Path
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
-TEMPLATE_DIR = ROOT / "templates" / "slack-app"
-GENERATOR = TEMPLATE_DIR / "generate.py"
-TEMPLATE = TEMPLATE_DIR / "template.json"
+SKILL_DIR = ROOT / "skills" / "slack-app-manifest"
+SKILL_MD = SKILL_DIR / "SKILL.md"
+GENERATOR = SKILL_DIR / "scripts" / "generate_slack_manifest.py"
+TEMPLATE = SKILL_DIR / "templates" / "template.json"
 
 
 def _load_generator():
@@ -18,6 +21,19 @@ def _load_generator():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_skill_is_installable_from_a_github_tap():
+    text = SKILL_MD.read_text(encoding="utf-8")
+    _, frontmatter, body = text.split("---", 2)
+    metadata = yaml.safe_load(frontmatter)
+
+    assert metadata["name"] == "slack-app-manifest"
+    assert metadata["version"] == "1.0.0"
+    assert metadata["metadata"]["hermes"]["category"] == "integrations"
+    assert "scripts/generate_slack_manifest.py" in body
+    assert "templates/template.json" in body
+    assert (ROOT / "skills.sh.json").is_file()
 
 
 def test_template_is_runtime_plugin_free_and_paste_safe():

@@ -24,11 +24,11 @@
       ]
     },
     {
-      "id": "slack-app",
-      "name": "Simplified Slack App Manifest",
-      "type": "template",
-      "path": "templates/slack-app",
-      "profileScoped": false,
+      "id": "slack-app-manifest",
+      "name": "Slack App Manifest",
+      "type": "hermes-skill",
+      "path": "skills/slack-app-manifest",
+      "profileScoped": true,
       "runtimePlugin": false
     }
   ]

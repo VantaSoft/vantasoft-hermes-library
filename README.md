@@ -18,11 +18,11 @@ Path: [`plugins/agent-messaging`](plugins/agent-messaging)
 
 Hermes-native peer profile discovery, tracked cross-profile messaging, explicit replies, and conversation resumption. This unbranded plugin supersedes the earlier `vantasoft-hermes-plugin` and `vantasoft-agents` names.
 
-### Simplified Slack app manifest
+### Slack app manifest skill
 
-Path: [`templates/slack-app`](templates/slack-app)
+Path: [`skills/slack-app-manifest`](skills/slack-app-manifest)
 
-A validated Slack app manifest template and generator for named Hermes agents. This is a provisioning asset rather than a runtime plugin because it registers no tools, hooks, commands, or adapters.
+An a-la-carte Hermes skill containing the prompting, validated template, and deterministic generator for named Slack agents. It installs independently and registers no runtime integration tools.
 
 ## Mix and match by profile
 
@@ -46,7 +46,7 @@ mcp_servers:
       - /absolute/path/to/vantasoft-hermes-plugins/mcps/google-workspace/dist/index.js
 ```
 
-Another profile can enable only `agent-messaging`, only Google Workspace, or neither. Google OAuth state and other component credentials must remain inside that profile's `HERMES_HOME`.
+Another profile can enable only `agent-messaging`, only Google Workspace, or neither. The Slack manifest skill can be installed independently in any profile that performs agent setup. Google OAuth state and other component credentials must remain inside that profile's `HERMES_HOME`.
 
 ## Install the directory plugin
 
@@ -66,20 +66,21 @@ npm test
 
 See the component README for OAuth setup and profile configuration.
 
-## Generate a Slack manifest
+## Install the Slack manifest skill
 
 ```bash
-python templates/slack-app/generate.py \
-  --name "Agent Name" \
-  --description "Short agent description"
+hermes skills tap add VantaSoft/vantasoft-hermes-plugins
+hermes skills install VantaSoft/vantasoft-hermes-plugins/slack-app-manifest
 ```
+
+After installation, invoke `/slack-app-manifest` or ask the agent to generate a Slack app manifest.
 
 ## Development
 
 Python formatting and tests:
 
 ```bash
-python -m ruff check plugins templates tests
+python -m ruff check plugins skills tests
 python -m pytest -q tests/test_slack_manifest.py
 ```
 
