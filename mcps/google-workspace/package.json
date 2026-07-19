@@ -1,0 +1,45 @@
+{
+  "name": "@vantasoft/google-workspace-mcp",
+  "version": "2.0.0",
+  "description": "Profile-local multi-account Google Workspace MCP server for Hermes",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "google-workspace-mcp": "./dist/index.js",
+    "google-workspace-setup": "./dist/setup.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "setup": "npm run build --silent && node dist/setup.js",
+    "test": "npm run build && node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "hermes-agent",
+    "mcp",
+    "google-workspace",
+    "gmail",
+    "google-calendar",
+    "google-drive"
+  ],
+  "author": "VantaSoft",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VantaSoft/vantasoft-hermes-plugins.git",
+    "directory": "mcps/google-workspace"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "googleapis": "^171.4.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.2"
+  }
+}

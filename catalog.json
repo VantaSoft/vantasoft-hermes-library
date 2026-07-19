@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "id": "google-workspace",
+      "name": "Google Workspace MCP",
+      "type": "mcp",
+      "path": "mcps/google-workspace",
+      "profileScoped": true,
+      "credentialModel": "HERMES_HOME/mcp-tokens/google-workspace",
+      "supportsMultipleAccounts": true
+    },
+    {
+      "id": "agent-messaging",
+      "name": "Agent Messaging",
+      "type": "hermes-plugin",
+      "path": "plugins/agent-messaging",
+      "profileScoped": true,
+      "providesTools": [
+        "list_agents",
+        "agent_status",
+        "message_agent",
+        "agent_reply"
+      ]
+    },
+    {
+      "id": "slack-app-manifest",
+      "name": "Slack App Manifest",
+      "type": "hermes-skill",
+      "path": "skills/slack-app-manifest",
+      "profileScoped": true,
+      "runtimePlugin": false
+    }
+  ]
+}

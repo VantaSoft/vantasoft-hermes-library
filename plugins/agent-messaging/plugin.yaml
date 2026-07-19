@@ -1,0 +1,10 @@
+name: agent-messaging
+version: 0.3.0
+description: "Hermes-native peer-agent discovery, tracked cross-profile messaging, and resumable conversations."
+author: VantaSoft
+kind: standalone
+provides_tools:
+  - list_agents
+  - agent_status
+  - message_agent
+  - agent_reply
