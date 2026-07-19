@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "id": "google-workspace",
+      "name": "Google Workspace MCP",
+      "type": "mcp",
+      "path": "mcps/google-workspace",
+      "profileScoped": true,
+      "credentialModel": "HERMES_HOME/mcp-tokens/google-workspace",
+      "supportsMultipleAccounts": true
+    },
+    {
+      "id": "vantasoft-agents",
+      "name": "VantaSoft Agents",
+      "type": "hermes-plugin",
+      "path": "plugins/vantasoft-agents",
+      "profileScoped": true,
+      "providesTools": [
+        "list_agents",
+        "agent_status",
+        "message_agent",
+        "agent_reply"
+      ]
+    },
+    {
+      "id": "slack-app",
+      "name": "Simplified Slack App Manifest",
+      "type": "template",
+      "path": "templates/slack-app",
+      "profileScoped": false,
+      "runtimePlugin": false
+    }
+  ]
+}

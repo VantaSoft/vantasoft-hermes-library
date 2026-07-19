@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+
+# Secrets and local credentials
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+google_token.json
+google_accounts.json
+mcp-tokens/
+
+# Scratch and build artifacts
+.tmp/
+tmp/
+build/
+coverage/
