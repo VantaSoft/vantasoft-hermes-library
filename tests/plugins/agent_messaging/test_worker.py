@@ -4,7 +4,7 @@ import json
 import sys
 from types import SimpleNamespace
 
-from vantasoft_hermes_plugin import worker
+from hermes_agent_messaging import worker
 
 
 def _job(tmp_path):

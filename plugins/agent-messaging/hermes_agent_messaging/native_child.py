@@ -105,7 +105,7 @@ def spawn_profile_child(
         effective_registry = process_registry
 
     target_home = Path(str(job["target_home"]))
-    runtime_dir = target_home / "tmp" / "vantasoft-agent-messages"
+    runtime_dir = target_home / "tmp" / "agent-messaging"
     runtime_dir.mkdir(parents=True, exist_ok=True)
     prune_failure_logs(runtime_dir)
     message_id = str(job["message_id"])
@@ -151,7 +151,7 @@ def spawn_profile_child(
             kill = getattr(effective_registry, "kill_process", None)
             if callable(kill):
                 with suppress(Exception):
-                    kill(process_session.id, source="vantasoft_agents_watcher_setup")
+                    kill(process_session.id, source="agent_messaging_watcher_setup")
         job_path.unlink(missing_ok=True)
         raise
 

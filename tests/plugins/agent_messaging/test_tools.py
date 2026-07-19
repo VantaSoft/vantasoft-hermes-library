@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from vantasoft_hermes_plugin import schemas, tools
+from hermes_agent_messaging import schemas, tools
 
 
 def test_list_agents_returns_profile_metadata(monkeypatch):

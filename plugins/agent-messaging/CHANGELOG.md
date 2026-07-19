@@ -4,6 +4,13 @@ All notable changes to this project will be documented here.
 
 The project follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.0]
+
+### Changed
+
+* Rename the plugin from `vantasoft-agents` to the unbranded `agent-messaging`.
+* Rename the Python package to `hermes_agent_messaging` and runtime scratch paths to `agent-messaging`.
+
 ## [0.2.1]
 
 ### Changed

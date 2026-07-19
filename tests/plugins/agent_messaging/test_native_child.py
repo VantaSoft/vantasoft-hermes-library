@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-from vantasoft_hermes_plugin import native_child
+from hermes_agent_messaging import native_child
 
 
 class FakeRegistry:
@@ -114,7 +114,7 @@ def test_spawn_fails_closed_without_env_executable(monkeypatch, tmp_path):
         raise AssertionError("Expected secure bootstrap failure")
 
     assert registry.spawn_calls == []
-    runtime_dir = Path(job["target_home"]) / "tmp" / "vantasoft-agent-messages"
+    runtime_dir = Path(job["target_home"]) / "tmp" / "agent-messaging"
     assert not (runtime_dir / f"{job['message_id']}.json").exists()
 
 
@@ -134,5 +134,5 @@ def test_incomplete_route_is_rejected(tmp_path):
         raise AssertionError("Expected incomplete route to fail")
 
     assert registry.checkpoints == 0
-    runtime_dir = Path(job["target_home"]) / "tmp" / "vantasoft-agent-messages"
+    runtime_dir = Path(job["target_home"]) / "tmp" / "agent-messaging"
     assert not (runtime_dir / f"{job['message_id']}.json").exists()

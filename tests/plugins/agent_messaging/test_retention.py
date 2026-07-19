@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from vantasoft_hermes_plugin import retention
+from hermes_agent_messaging import retention
 
 
 def _write_log(path, *, modified_at):

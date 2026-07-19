@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import hermes_agent_messaging
 import pytest
-import vantasoft_hermes_plugin
 import yaml
-from vantasoft_hermes_plugin import compat
+from hermes_agent_messaging import compat
 
 ROOT = Path(__file__).resolve().parents[3]
-PLUGIN_ROOT = ROOT / "plugins" / "vantasoft-agents"
+PLUGIN_ROOT = ROOT / "plugins" / "agent-messaging"
 
 
 def test_manifest_and_package_versions_match():
     manifest = yaml.safe_load((PLUGIN_ROOT / "plugin.yaml").read_text())
 
-    assert manifest["name"] == "vantasoft-agents"
-    assert manifest["version"] == vantasoft_hermes_plugin.__version__
+    assert manifest["name"] == "agent-messaging"
+    assert manifest["version"] == hermes_agent_messaging.__version__
     assert set(manifest["provides_tools"]) == {
         "list_agents",
         "agent_status",
@@ -26,7 +26,7 @@ def test_manifest_and_package_versions_match():
 
 def test_plugin_contains_no_internal_fleet_routes():
     forbidden = ("/Users/", "slack:#agent-comms", "hermes_gateway_restarts.py")
-    package_root = PLUGIN_ROOT / "vantasoft_hermes_plugin"
+    package_root = PLUGIN_ROOT / "hermes_agent_messaging"
 
     for path in package_root.glob("*.py"):
         content = path.read_text()

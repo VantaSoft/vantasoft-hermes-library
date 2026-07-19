@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from vantasoft_hermes_plugin import target_runner
+from hermes_agent_messaging import target_runner
 
 
 def test_build_argv_keeps_prompt_in_memory_and_supports_resume():

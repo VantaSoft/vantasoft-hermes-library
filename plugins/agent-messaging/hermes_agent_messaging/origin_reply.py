@@ -45,7 +45,7 @@ def format_reply(
 
 @contextmanager
 def _reply_lock(origin_home: Path) -> Iterator[None]:
-    lock_path = origin_home / "tmp" / "vantasoft-agent-replies.lock"
+    lock_path = origin_home / "tmp" / "agent-messaging-replies.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     handle = lock_path.open("a+")
     try:

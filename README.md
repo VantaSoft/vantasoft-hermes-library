@@ -12,11 +12,11 @@ Path: [`mcps/google-workspace`](mcps/google-workspace)
 
 A Gmail, Calendar, Drive, Docs, and Sheets MCP server with multiple profile-local Google accounts. It uses `HERMES_HOME/mcp-tokens/google-workspace`, supports explicit and default account selection, refreshes locally, and has no token-service dependency.
 
-### VantaSoft Agents plugin
+### Agent Messaging plugin
 
-Path: [`plugins/vantasoft-agents`](plugins/vantasoft-agents)
+Path: [`plugins/agent-messaging`](plugins/agent-messaging)
 
-Hermes-native peer profile discovery, tracked cross-profile messaging, explicit replies, and conversation resumption. This plugin was previously maintained as `vantasoft-hermes-plugin`; the VantaSoft fork currently bundles a pinned copy under the live name `vantasoft-agents`.
+Hermes-native peer profile discovery, tracked cross-profile messaging, explicit replies, and conversation resumption. This unbranded plugin supersedes the earlier `vantasoft-hermes-plugin` and `vantasoft-agents` names.
 
 ### Simplified Slack app manifest
 
@@ -33,7 +33,7 @@ Example profile using both Google Workspace and peer messaging:
 ```yaml
 plugins:
   enabled:
-    - vantasoft-agents
+    - agent-messaging
 
 platform_toolsets:
   slack:
@@ -46,12 +46,12 @@ mcp_servers:
       - /absolute/path/to/vantasoft-hermes-plugins/mcps/google-workspace/dist/index.js
 ```
 
-Another profile can enable only `vantasoft-agents`, only Google Workspace, or neither. Google OAuth state and other component credentials must remain inside that profile's `HERMES_HOME`.
+Another profile can enable only `agent-messaging`, only Google Workspace, or neither. Google OAuth state and other component credentials must remain inside that profile's `HERMES_HOME`.
 
 ## Install the directory plugin
 
 ```bash
-hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/vantasoft-agents --enable
+hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/agent-messaging --enable
 ```
 
 Hermes supports installing a plugin from a repository subdirectory, but its current subdirectory update path does not retain Git metadata. Until that upstream limitation is fixed, update with `--force` using the same install command.
@@ -83,11 +83,11 @@ python -m ruff check plugins templates tests
 python -m pytest -q tests/test_slack_manifest.py
 ```
 
-The `vantasoft-agents` suite must run against a compatible VantaSoft Hermes Agent checkout:
+The `agent-messaging` suite must run against a compatible VantaSoft Hermes Agent checkout:
 
 ```bash
 PYTHONPATH=/path/to/vantasoft-hermes-agent \
-  python -m pytest -q tests/plugins/vantasoft_agents
+  python -m pytest -q tests/plugins/agent_messaging
 ```
 
 Node tests:

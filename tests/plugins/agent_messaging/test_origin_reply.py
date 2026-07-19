@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from vantasoft_hermes_plugin import origin_reply
+from hermes_agent_messaging import origin_reply
 
 
 def _create_session(tmp_path, session_id="origin-session"):

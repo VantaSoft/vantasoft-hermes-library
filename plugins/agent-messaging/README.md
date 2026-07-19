@@ -1,8 +1,8 @@
-# VantaSoft Agents Plugin
+# Agent Messaging Plugin
 
-Hermes-native peer-agent messaging maintained in the public VantaSoft plugin catalog. The VantaSoft Hermes Agent fork currently bundles a pinned copy for out-of-the-box fleet deployments.
+Hermes-native peer-agent messaging maintained in the public VantaSoft plugin catalog. The VantaSoft Hermes Agent fork can bundle a pinned copy for out-of-the-box fleet deployments.
 
-The `vantasoft-agents` directory plugin lets profiles in one trusted Hermes installation discover each other, start tracked full-profile child runs, deliver explicit progress and final replies to the initiating session, and resume earlier peer conversations.
+The `agent-messaging` directory plugin lets profiles in one trusted Hermes installation discover each other, start tracked full-profile child runs, deliver explicit progress and final replies to the initiating session, and resume earlier peer conversations.
 
 ## Tools
 
@@ -34,13 +34,13 @@ The plugin is tested against a pinned compatible VantaSoft Hermes Agent revision
 The VantaSoft fork already discovers its bundled copy. For another compatible Hermes checkout, install this directory from the catalog:
 
 ```bash
-hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/vantasoft-agents --enable
+hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/agent-messaging --enable
 ```
 
 Hermes currently cannot update a plugin installed from a repository subdirectory because the subdirectory install does not retain Git metadata. Until that Hermes limitation is fixed, update with a force reinstall:
 
 ```bash
-hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/vantasoft-agents --force --enable
+hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/agent-messaging --force --enable
 ```
 
 Enable it in each participating profile:
@@ -48,9 +48,9 @@ Enable it in each participating profile:
 ```yaml
 plugins:
   enabled:
-    - vantasoft-agents
+    - agent-messaging
   entries:
-    vantasoft-agents:
+    agent-messaging:
       allow_tool_override: false
 
 platform_toolsets:
@@ -68,7 +68,7 @@ Restart the relevant gateways after enabling the plugin or changing its configur
 hermes --profile default plugins list --plain
 ```
 
-The output should show the bundled `vantasoft-agents` plugin as enabled. In a
+The output should show the `agent-messaging` plugin as enabled. In a
 Hermes session, `/plugins` should show four registered tools.
 
 ## How delivery works
@@ -112,15 +112,15 @@ To continue the same target context, call `message_agent` again with the previou
 
 All participating profiles are inside one trust boundary. A target run uses the target profile's own identity, tools, credentials, memory, and workspace. Do not co-locate unrelated customers and treat profiles as a security boundary.
 
-Job envelopes use mode `0600` where supported and are deleted when the worker reads them. Successful-run diagnostic logs are deleted automatically. Failure logs remain under the target profile's `tmp/vantasoft-agent-messages/` directory, may contain sensitive target output, and are capped at 1 MiB each, 10 files, and 7 days.
+Job envelopes use mode `0600` where supported and are deleted when the worker reads them. Successful-run diagnostic logs are deleted automatically. Failure logs remain under the target profile's `tmp/agent-messaging/` directory, may contain sensitive target output, and are capped at 1 MiB each, 10 files, and 7 days.
 
 See [SECURITY.md](SECURITY.md) for disclosure and trust-boundary details.
 
 ## Development
 
 ```bash
-python -m pytest -q tests/plugins/vantasoft_agents
-python -m ruff check plugins/vantasoft-agents tests/plugins/vantasoft_agents
+python -m pytest -q tests/plugins/agent_messaging
+python -m ruff check plugins/agent-messaging tests/plugins/agent_messaging
 ```
 
 ## License

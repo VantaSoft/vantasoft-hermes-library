@@ -1,5 +1,5 @@
-name: vantasoft-agents
-version: 0.2.1
+name: agent-messaging
+version: 0.3.0
 description: "Hermes-native peer-agent discovery, tracked cross-profile messaging, and resumable conversations."
 author: VantaSoft
 kind: standalone

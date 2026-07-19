@@ -60,9 +60,9 @@ if __package__:
     from .retention import finalize_log, mark_log_active, prune_failure_logs, unmark_log_active
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from vantasoft_hermes_plugin.origin_reply import append_origin_reply
-    from vantasoft_hermes_plugin.paths import profile_subprocess_environment
-    from vantasoft_hermes_plugin.retention import (
+    from hermes_agent_messaging.origin_reply import append_origin_reply
+    from hermes_agent_messaging.paths import profile_subprocess_environment
+    from hermes_agent_messaging.retention import (
         finalize_log,
         mark_log_active,
         prune_failure_logs,

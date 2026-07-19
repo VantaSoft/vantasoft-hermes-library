@@ -59,6 +59,6 @@ def ensure_compatible_runtime() -> None:
     if missing:
         details = ", ".join(sorted(set(missing)))
         raise IncompatibleHermesError(
-            "vantasoft-agents requires its tested Hermes Agent 0.18.0 runtime APIs; "
+            "agent-messaging requires its tested Hermes Agent 0.18.0 runtime APIs; "
             "missing: " + details
         )

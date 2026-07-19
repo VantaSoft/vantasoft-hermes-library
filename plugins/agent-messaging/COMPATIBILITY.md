@@ -1,6 +1,6 @@
 # Compatibility
 
-The plugin is maintained and tested with the VantaSoft Hermes Agent runtime. The fork may bundle a pinned copy, while compatible deployments can install this directory from the VantaSoft plugin catalog. It has no independent wheel or package entry point.
+The plugin is maintained and tested with the VantaSoft Hermes Agent runtime. The fork may bundle a pinned copy, while compatible deployments can install this directory from the public plugin catalog. It has no independent wheel or package entry point.
 
 The plugin uses Hermes profile, process-registry, gateway session-context, and session-database APIs. It checks the required runtime surface during registration and fails with a clear compatibility error when that surface is unavailable.
 

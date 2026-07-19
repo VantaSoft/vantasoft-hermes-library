@@ -11,10 +11,10 @@
       "supportsMultipleAccounts": true
     },
     {
-      "id": "vantasoft-agents",
-      "name": "VantaSoft Agents",
+      "id": "agent-messaging",
+      "name": "Agent Messaging",
       "type": "hermes-plugin",
-      "path": "plugins/vantasoft-agents",
+      "path": "plugins/agent-messaging",
       "profileScoped": true,
       "providesTools": [
         "list_agents",
