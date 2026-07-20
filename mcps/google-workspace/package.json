@@ -30,7 +30,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VantaSoft/vantasoft-hermes-plugins.git",
+    "url": "https://github.com/VantaSoft/vantasoft-hermes-library.git",
     "directory": "mcps/google-workspace"
   },
   "dependencies": {

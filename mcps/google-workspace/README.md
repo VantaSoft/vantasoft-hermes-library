@@ -68,7 +68,7 @@ mcp_servers:
   google_workspace:
     command: node
     args:
-      - /absolute/path/to/vantasoft-hermes-plugins/mcps/google-workspace/dist/index.js
+      - /absolute/path/to/vantasoft-hermes-library/mcps/google-workspace/dist/index.js
 ```
 
 The MCP process inherits the profile's `HERMES_HOME`. Do not set `TOKEN_SERVICE_URL`, `TOKEN_SERVICE_API_KEY`, or a shared token directory.

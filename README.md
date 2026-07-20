@@ -1,24 +1,32 @@
-# VantaSoft Hermes Plugins
+# VantaSoft Hermes Library
 
-Reusable Hermes plugins, MCP servers, and setup assets maintained by VantaSoft.
+Reusable Hermes plugins, MCP servers, and skills maintained by VantaSoft.
 
-This repository is the source catalog for extension code that should evolve independently from the [`vantasoft-hermes-agent`](https://github.com/VantaSoft/vantasoft-hermes-agent) fork. Deployments can select only the components they need.
+This repository is the source library for extension code that should evolve independently from the [`vantasoft-hermes-agent`](https://github.com/VantaSoft/vantasoft-hermes-agent) fork. Deployments can select only the components they need.
 
-## Catalog
+## Components
 
-### Google Workspace MCP
+Components are organized by type under `plugins/`, `mcps/`, and `skills/`.
 
-Path: [`mcps/google-workspace`](mcps/google-workspace)
+### Plugins
 
-A Gmail, Calendar, Drive, Docs, and Sheets MCP server with multiple profile-local Google accounts. It uses `HERMES_HOME/mcp-tokens/google-workspace`, supports explicit and default account selection, refreshes locally, and has no token-service dependency.
-
-### Agent Messaging plugin
+#### Agent Messaging
 
 Path: [`plugins/agent-messaging`](plugins/agent-messaging)
 
 Hermes-native peer profile discovery, tracked cross-profile messaging, explicit replies, and conversation resumption. This unbranded plugin supersedes the earlier `vantasoft-hermes-plugin` and `vantasoft-agents` names.
 
-### Slack app manifest skill
+### MCPs
+
+#### Google Workspace
+
+Path: [`mcps/google-workspace`](mcps/google-workspace)
+
+A Gmail, Calendar, Drive, Docs, and Sheets MCP server with multiple profile-local Google accounts. It uses `HERMES_HOME/mcp-tokens/google-workspace`, supports explicit and default account selection, refreshes locally, and has no token-service dependency.
+
+### Skills
+
+#### Slack App Manifest
 
 Path: [`skills/slack-app-manifest`](skills/slack-app-manifest)
 
@@ -43,7 +51,7 @@ mcp_servers:
   google_workspace:
     command: node
     args:
-      - /absolute/path/to/vantasoft-hermes-plugins/mcps/google-workspace/dist/index.js
+      - /absolute/path/to/vantasoft-hermes-library/mcps/google-workspace/dist/index.js
 ```
 
 Another profile can enable only `agent-messaging`, only Google Workspace, or neither. The Slack manifest skill can be installed independently in any profile that performs agent setup. Google OAuth state and other component credentials must remain inside that profile's `HERMES_HOME`.
@@ -51,7 +59,7 @@ Another profile can enable only `agent-messaging`, only Google Workspace, or nei
 ## Install the directory plugin
 
 ```bash
-hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/agent-messaging --enable
+hermes plugins install VantaSoft/vantasoft-hermes-library/plugins/agent-messaging --enable
 ```
 
 Hermes supports installing a plugin from a repository subdirectory, but its current subdirectory update path does not retain Git metadata. Until that upstream limitation is fixed, update with `--force` using the same install command.
@@ -69,8 +77,8 @@ See the component README for OAuth setup and profile configuration.
 ## Install the Slack manifest skill
 
 ```bash
-hermes skills tap add VantaSoft/vantasoft-hermes-plugins
-hermes skills install VantaSoft/vantasoft-hermes-plugins/slack-app-manifest
+hermes skills tap add VantaSoft/vantasoft-hermes-library
+hermes skills install VantaSoft/vantasoft-hermes-library/slack-app-manifest
 ```
 
 After installation, invoke `/slack-app-manifest` or ask the agent to generate a Slack app manifest.
