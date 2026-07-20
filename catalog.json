@@ -30,6 +30,24 @@
       "path": "skills/slack-app-manifest",
       "profileScoped": true,
       "runtimePlugin": false
+    },
+    {
+      "id": "approval-gated-email",
+      "name": "Approval-Gated Email",
+      "type": "hermes-skill",
+      "path": "skills/approval-gated-email",
+      "profileScoped": true,
+      "runtimePlugin": false,
+      "companionComponent": "google-workspace"
+    },
+    {
+      "id": "approval-gated-calendar",
+      "name": "Approval-Gated Calendar",
+      "type": "hermes-skill",
+      "path": "skills/approval-gated-calendar",
+      "profileScoped": true,
+      "runtimePlugin": false,
+      "companionComponent": "google-workspace"
     }
   ]
 }

@@ -26,6 +26,18 @@ A Gmail, Calendar, Drive, Docs, and Sheets MCP server with multiple profile-loca
 
 ### Skills
 
+#### Approval-Gated Email
+
+Path: [`skills/approval-gated-email`](skills/approval-gated-email)
+
+A provider-aware Gmail workflow that keeps new messages, replies, forwards, and provider-side drafts behind explicit human approval. It preserves original message and thread identifiers, participant intent, attachments, account selection, and safe retry behavior.
+
+#### Approval-Gated Calendar
+
+Path: [`skills/approval-gated-calendar`](skills/approval-gated-calendar)
+
+A Google Calendar workflow that keeps event creation, updates, and deletion behind explicit human approval. It covers account and attendee resolution, timezone-safe scheduling, availability and duplicate checks, invitation notifications, conferencing, and post-action verification.
+
 #### Slack App Manifest
 
 Path: [`skills/slack-app-manifest`](skills/slack-app-manifest)
@@ -74,14 +86,16 @@ npm test
 
 See the component README for OAuth setup and profile configuration.
 
-## Install the Slack manifest skill
+## Install skills
 
 ```bash
 hermes skills tap add VantaSoft/vantasoft-hermes-library
+hermes skills install VantaSoft/vantasoft-hermes-library/approval-gated-email
+hermes skills install VantaSoft/vantasoft-hermes-library/approval-gated-calendar
 hermes skills install VantaSoft/vantasoft-hermes-library/slack-app-manifest
 ```
 
-After installation, invoke `/slack-app-manifest` or ask the agent to generate a Slack app manifest.
+After installation, invoke a skill by name or ask the agent for the corresponding workflow. The approval-gated communication skills are designed for profiles using this repository's Google Workspace MCP.
 
 ## Development
 
@@ -89,7 +103,7 @@ Python formatting and tests:
 
 ```bash
 python -m ruff check plugins skills tests
-python -m pytest -q tests/test_slack_manifest.py
+python -m pytest -q tests/test_slack_manifest.py tests/test_approval_gated_skills.py
 ```
 
 The `agent-messaging` suite must run against a compatible VantaSoft Hermes Agent checkout:
