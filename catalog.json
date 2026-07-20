@@ -24,6 +24,18 @@
       ]
     },
     {
+      "id": "create-agent-profile",
+      "name": "Create Agent Profile",
+      "type": "hermes-skill",
+      "path": "skills/create-agent-profile",
+      "profileScoped": true,
+      "runtimePlugin": false,
+      "companionComponents": [
+        "agent-messaging",
+        "slack-app-manifest"
+      ]
+    },
+    {
       "id": "slack-app-manifest",
       "name": "Slack App Manifest",
       "type": "hermes-skill",

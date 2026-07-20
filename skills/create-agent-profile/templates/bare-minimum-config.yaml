@@ -1,0 +1,63 @@
+# Replace both placeholders before installing this profile config.
+model:
+  default: gpt-5.6-sol
+  provider: openai-codex
+  base_url: https://chatgpt.com/backend-api/codex
+
+agent:
+  max_turns: 300
+  reasoning_effort: xhigh
+  verify_on_stop: false
+
+terminal:
+  backend: local
+  cwd: "<fleet-root>"
+  timeout: 180
+
+compression:
+  threshold: 0.85
+  codex_gpt55_autoraise: false
+
+auxiliary:
+  compression:
+    timeout: 300
+
+cron:
+  wrap_response: false
+
+display:
+  tool_progress: 'off'
+  show_reasoning: false
+  streaming: true
+  platforms:
+    slack:
+      long_running_notifications: false
+
+approvals:
+  mode: false
+
+group_sessions_per_user: false
+
+slack:
+  gateway_restart_notification: false
+  reactions: false
+
+platforms:
+  slack:
+    gateway_restart_notification: false
+
+platform_toolsets:
+  slack:
+    - delegation
+    - file
+    - terminal
+    - session_search
+    - memory
+    - clarify
+  cli:
+    - delegation
+    - file
+    - terminal
+    - session_search
+    - memory
+    - clarify
