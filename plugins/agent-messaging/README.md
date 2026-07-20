@@ -1,6 +1,6 @@
 # Agent Messaging Plugin
 
-Hermes-native peer-agent messaging maintained in the public VantaSoft plugin catalog. The VantaSoft Hermes Agent fork can bundle a pinned copy for out-of-the-box fleet deployments.
+Hermes-native peer-agent messaging maintained in the public VantaSoft Hermes Library.
 
 The `agent-messaging` directory plugin lets profiles in one trusted Hermes installation discover each other, start tracked full-profile child runs, deliver explicit progress and final replies to the initiating session, and resume earlier peer conversations.
 
@@ -31,16 +31,16 @@ The plugin is tested against a pinned compatible VantaSoft Hermes Agent revision
 
 ## Install or enable the plugin
 
-The VantaSoft fork already discovers its bundled copy. For another compatible Hermes checkout, install this directory from the catalog:
+Install this directory from the VantaSoft Hermes Library into a compatible Hermes checkout:
 
 ```bash
-hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/agent-messaging --enable
+hermes plugins install VantaSoft/vantasoft-hermes-library/plugins/agent-messaging --enable
 ```
 
 Hermes currently cannot update a plugin installed from a repository subdirectory because the subdirectory install does not retain Git metadata. Until that Hermes limitation is fixed, update with a force reinstall:
 
 ```bash
-hermes plugins install VantaSoft/vantasoft-hermes-plugins/plugins/agent-messaging --force --enable
+hermes plugins install VantaSoft/vantasoft-hermes-library/plugins/agent-messaging --force --enable
 ```
 
 Enable it in each participating profile:
