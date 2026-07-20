@@ -6,6 +6,13 @@
       "skills": [
         "slack-app-manifest"
       ]
+    },
+    {
+      "title": "Google Workspace Operations",
+      "skills": [
+        "approval-gated-email",
+        "approval-gated-calendar"
+      ]
     }
   ]
 }
