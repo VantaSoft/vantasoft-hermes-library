@@ -23,7 +23,7 @@ def test_create_agent_profile_is_a_flat_installable_skill():
 
     assert SKILL_DIR.parent == ROOT / "skills"
     assert metadata["name"] == "create-agent-profile"
-    assert metadata["version"] == "2.0.0"
+    assert metadata["version"] == "2.0.1"
     assert metadata["license"] == "MIT"
     assert metadata["metadata"]["hermes"]["category"] == "autonomous-ai-agents"
     assert metadata["metadata"]["hermes"]["renamed_from"] == ["new-agent-setup"]
@@ -31,6 +31,17 @@ def test_create_agent_profile_is_a_flat_installable_skill():
         "/skills/create-agent-profile"
     )
     assert TEMPLATE.is_file()
+
+
+def test_create_agent_profile_intake_omits_integrations_question():
+    text = SKILL_MD.read_text(encoding="utf-8")
+
+    for field in ("**Name**", "**Title**", "**Responsibilities**"):
+        assert field in text
+    assert "• **Integrations**" not in text
+    assert "Do not include an **Integrations** field in the initial intake" in text
+    assert "Ask for any missing Name, Title, and Responsibilities" in text
+    assert "Do not request a broad integrations inventory" in text
 
 
 def test_bare_minimum_template_is_safe_and_renderable():

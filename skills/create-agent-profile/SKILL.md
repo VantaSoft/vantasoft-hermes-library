@@ -1,7 +1,7 @@
 ---
 name: create-agent-profile
 description: Create minimal zero-skill VantaSoft agent profiles.
-version: 2.0.0
+version: 2.0.1
 author: Forrest Zhang (VantaSoft) and Hermes Agent
 license: MIT
 metadata:
@@ -38,8 +38,9 @@ For every item not already supplied, ask one concise intake containing exactly t
 
 • **Name**: the agent's visible human name;
 • **Title**: the agent's concise professional title;
-• **Responsibilities**: its ownership boundary, recurring duties, supported company or customer scope, and escalation triggers;
-• **Integrations**: required messaging platforms such as Slack, peer messaging, cron, MCP servers, and any other external systems, with `none` allowed.
+• **Responsibilities**: its ownership boundary, recurring duties, supported company or customer scope, and escalation triggers.
+
+Do not include an **Integrations** field in the initial intake. Infer baseline tools and likely integrations from Responsibilities and the established deployment context. Ask one targeted follow-up during configuration only when a role-required external system cannot be determined or safely configured without user input.
 
 Do not ask the user to invent a filesystem profile name. Derive it from **Name** by Unicode-normalizing and transliterating to ASCII when unambiguous, lowercasing, replacing every run outside `[a-z0-9]` with `-`, collapsing repeated separators, trimming separators, and limiting the result to 64 characters. Validate the result with Hermes's native `normalize_profile_name` and `validate_profile_name` behavior before creation. Preserve the original human-facing Name in `SOUL.md`.
 
@@ -100,7 +101,7 @@ Keep secret values only in the deployment's approved secret store or the target 
 
 ### 1. Collect the human-facing agent definition
 
-Ask for any missing Name, Title, Responsibilities, and Integrations in one concise message. Derive supported companies or customers, expected users, ownership boundaries, and escalation triggers from Responsibilities plus the established fleet context. Ask a follow-up only when a trust boundary remains materially ambiguous.
+Ask for any missing Name, Title, and Responsibilities in one concise message. Derive supported companies or customers, expected users, ownership boundaries, escalation triggers, and role-required integrations from Responsibilities plus the established fleet context. Do not request a broad integrations inventory. Ask a targeted follow-up only when a trust boundary or required external system remains materially ambiguous.
 
 Use a separate Hermes data root, shared Codex auth store, and writable volume for every customer deployment.
 
