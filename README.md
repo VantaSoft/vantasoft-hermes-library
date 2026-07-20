@@ -26,6 +26,12 @@ A Gmail, Calendar, Drive, Docs, and Sheets MCP server with multiple profile-loca
 
 ### Skills
 
+#### New Agent Setup
+
+Path: [`skills/new-agent-setup`](skills/new-agent-setup)
+
+The canonical installable workflow and reviewed bare-minimum config template for creating named, zero-skill VantaSoft Hermes profiles without cloning credentials, memories, sessions, or customer state. The VantaSoft Hermes Agent fork also bundles this same flat package so first-run and managed-host bootstrap work without a prior tap or network lookup.
+
 #### Approval-Gated Email
 
 Path: [`skills/approval-gated-email`](skills/approval-gated-email)
@@ -90,6 +96,7 @@ See the component README for OAuth setup and profile configuration.
 
 ```bash
 hermes skills tap add VantaSoft/vantasoft-hermes-library
+hermes skills install VantaSoft/vantasoft-hermes-library/new-agent-setup
 hermes skills install VantaSoft/vantasoft-hermes-library/approval-gated-email
 hermes skills install VantaSoft/vantasoft-hermes-library/approval-gated-calendar
 hermes skills install VantaSoft/vantasoft-hermes-library/slack-app-manifest
@@ -103,7 +110,7 @@ Python formatting and tests:
 
 ```bash
 python -m ruff check plugins skills tests
-python -m pytest -q tests/test_slack_manifest.py tests/test_approval_gated_skills.py
+python -m pytest -q tests/test_slack_manifest.py tests/test_approval_gated_skills.py tests/test_new_agent_setup.py
 ```
 
 The `agent-messaging` suite must run against a compatible VantaSoft Hermes Agent checkout:
