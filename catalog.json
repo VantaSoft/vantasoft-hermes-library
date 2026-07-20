@@ -24,10 +24,10 @@
       ]
     },
     {
-      "id": "new-agent-setup",
-      "name": "New Agent Setup",
+      "id": "create-agent-profile",
+      "name": "Create Agent Profile",
       "type": "hermes-skill",
-      "path": "skills/new-agent-setup",
+      "path": "skills/create-agent-profile",
       "profileScoped": true,
       "runtimePlugin": false,
       "companionComponents": [

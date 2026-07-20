@@ -1,7 +1,7 @@
 ---
-name: new-agent-setup
+name: create-agent-profile
 description: Create minimal zero-skill VantaSoft agent profiles.
-version: 1.9.0
+version: 2.0.0
 author: Forrest Zhang (VantaSoft) and Hermes Agent
 license: MIT
 metadata:
@@ -9,10 +9,11 @@ metadata:
     category: autonomous-ai-agents
     tags: [profiles, multi-agent, vantasoft]
     related_skills: [hermes-agent]
-    homepage: https://github.com/VantaSoft/vantasoft-hermes-library/tree/main/skills/new-agent-setup
+    renamed_from: [new-agent-setup]
+    homepage: https://github.com/VantaSoft/vantasoft-hermes-library/tree/main/skills/create-agent-profile
 ---
 
-# New Agent Setup Skill
+# Create Agent Profile Skill
 
 Create a named VantaSoft Hermes profile with a minimal reviewed configuration and no bundled skills. This workflow configures the profile, identity, tools, credentials, and gateway without cloning another agent's state.
 
@@ -56,7 +57,7 @@ Never place tokens, OAuth grants, private keys, customer data, or credential val
 
 ## How to Run
 
-Invoke `/new-agent-setup` from an operator profile, or ask the operator agent to create a minimal profile using this skill.
+Invoke `/create-agent-profile` from an operator profile, or ask the operator agent to create a minimal profile using this skill.
 
 The skill uses:
 

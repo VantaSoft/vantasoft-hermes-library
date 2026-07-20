@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL_DIR = ROOT / "skills" / "new-agent-setup"
+SKILL_DIR = ROOT / "skills" / "create-agent-profile"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 TEMPLATE = SKILL_DIR / "templates" / "bare-minimum-config.yaml"
 
@@ -18,16 +18,17 @@ def _frontmatter() -> dict:
     return yaml.safe_load(raw)
 
 
-def test_new_agent_setup_is_a_flat_installable_skill():
+def test_create_agent_profile_is_a_flat_installable_skill():
     metadata = _frontmatter()
 
     assert SKILL_DIR.parent == ROOT / "skills"
-    assert metadata["name"] == "new-agent-setup"
-    assert metadata["version"] == "1.9.0"
+    assert metadata["name"] == "create-agent-profile"
+    assert metadata["version"] == "2.0.0"
     assert metadata["license"] == "MIT"
     assert metadata["metadata"]["hermes"]["category"] == "autonomous-ai-agents"
+    assert metadata["metadata"]["hermes"]["renamed_from"] == ["new-agent-setup"]
     assert metadata["metadata"]["hermes"]["homepage"].endswith(
-        "/skills/new-agent-setup"
+        "/skills/create-agent-profile"
     )
     assert TEMPLATE.is_file()
 
@@ -50,7 +51,7 @@ def test_bare_minimum_template_is_safe_and_renderable():
     assert "secret" not in text.lower()
 
 
-def test_catalogs_publish_new_agent_setup_once():
+def test_catalogs_publish_create_agent_profile_once():
     catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
     components = {component["id"]: component for component in catalog["components"]}
     skills_manifest = json.loads((ROOT / "skills.sh.json").read_text(encoding="utf-8"))
@@ -60,6 +61,6 @@ def test_catalogs_publish_new_agent_setup_once():
         for skill in grouping["skills"]
     ]
 
-    assert components["new-agent-setup"]["path"] == "skills/new-agent-setup"
-    assert components["new-agent-setup"]["type"] == "hermes-skill"
-    assert published.count("new-agent-setup") == 1
+    assert components["create-agent-profile"]["path"] == "skills/create-agent-profile"
+    assert components["create-agent-profile"]["type"] == "hermes-skill"
+    assert published.count("create-agent-profile") == 1
