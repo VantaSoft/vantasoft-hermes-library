@@ -33,6 +33,20 @@ npm ci
 npm run build
 ```
 
+### Install from the VantaSoft library
+
+The component includes [`mcp-install.json`](mcp-install.json) for the deterministic installer bundled with the `install-vantasoft-mcp` skill. After installing that skill from the VantaSoft tap, preview and install into the active profile with:
+
+```bash
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+  google-workspace \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}" \
+  --ref main \
+  --dry-run
+```
+
+Remove `--dry-run` after reviewing the plan. The installer downloads only this MCP subdirectory, builds and tests it, installs it under `HERMES_HOME/mcp-installs/google-workspace`, writes the Hermes MCP configuration, and prepares the profile-local credential directory without creating or copying OAuth grants.
+
 ## Configure OAuth
 
 Download a Google OAuth desktop client JSON and save it as:

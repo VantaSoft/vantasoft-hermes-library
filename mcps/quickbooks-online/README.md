@@ -45,6 +45,20 @@ npm run audit:prod
 
 `npm test` builds the TypeScript source, runs the full upstream-derived unit suite, and connects through a real stdio MCP client to verify the default read-only tool catalog.
 
+## Install from the VantaSoft library
+
+The component includes [`mcp-install.json`](mcp-install.json) for the deterministic installer bundled with the `install-vantasoft-mcp` skill. After installing that skill from the VantaSoft tap, preview and install into the active profile with:
+
+```bash
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+  quickbooks-online \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}" \
+  --ref main \
+  --dry-run
+```
+
+Remove `--dry-run` after reviewing the plan. The installer downloads only this MCP subdirectory, runs `npm ci`, builds it, executes its stdio smoke test, installs it under `HERMES_HOME/mcp-installs/quickbooks-online`, writes the Hermes MCP configuration, and creates the credential template only when it does not already exist. Mutations remain disabled.
+
 ## Profile-local credential setup
 
 Create a QuickBooks Online app in the [Intuit Developer Portal](https://developer.intuit.com/), then prepare the active Hermes profile's token file:

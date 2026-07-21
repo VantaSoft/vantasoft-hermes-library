@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "componentId": "google-workspace",
+  "displayName": "Google Workspace MCP",
+  "runtime": {
+    "command": "node",
+    "minimumVersion": "20.0.0",
+    "versionArgs": ["--version"]
+  },
+  "install": {
+    "bootstrap": [
+      ["npm", "ci", "--ignore-scripts"],
+      ["npm", "test"],
+      ["npm", "audit", "--omit=dev", "--audit-level=high"],
+      ["npm", "prune", "--omit=dev", "--ignore-scripts"]
+    ],
+    "requiredFiles": ["dist/index.js", "dist/setup.js"]
+  },
+  "transport": {
+    "serverName": "google_workspace",
+    "command": "node",
+    "args": ["${INSTALL_DIR}/dist/index.js"],
+    "timeout": 120,
+    "connectTimeout": 30
+  },
+  "credentials": {
+    "directory": "mcp-tokens/google-workspace"
+  },
+  "nextSteps": [
+    "Place the Google OAuth desktop client JSON at ${HERMES_HOME}/mcp-tokens/google-workspace/client.json.",
+    "Authorize an account locally with: HERMES_HOME=${HERMES_HOME} node ${INSTALL_DIR}/dist/setup.js auth <account-slug>",
+    "Reload MCP servers or restart the target Hermes gateway, then confirm the Google Workspace tools are available."
+  ]
+}

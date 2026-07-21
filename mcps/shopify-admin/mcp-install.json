@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "componentId": "shopify-admin",
+  "displayName": "Shopify Admin MCP",
+  "safeDefault": "read-only",
+  "runtime": {
+    "command": "node",
+    "minimumVersion": "20.0.0",
+    "versionArgs": ["--version"]
+  },
+  "install": {
+    "bootstrap": [
+      ["npm", "ci", "--ignore-scripts"],
+      ["npm", "test"],
+      ["npm", "run", "lint"],
+      ["npm", "run", "audit:prod"],
+      ["npm", "prune", "--omit=dev", "--ignore-scripts"]
+    ],
+    "requiredFiles": ["dist/index.js"]
+  },
+  "transport": {
+    "serverName": "shopify_admin",
+    "command": "node",
+    "args": ["${INSTALL_DIR}/dist/index.js"],
+    "env": {
+      "SHOPIFY_ENABLE_MUTATIONS": "false"
+    },
+    "timeout": 120,
+    "connectTimeout": 30
+  },
+  "credentials": {
+    "directory": "mcp-tokens/shopify-admin",
+    "template": "credentials.example.json",
+    "target": "mcp-tokens/shopify-admin/credentials.json"
+  },
+  "nextSteps": [
+    "Review and complete ${CREDENTIAL_FILE} locally. Never send its values through chat.",
+    "Grant each Shopify app only the Admin API scopes required by the selected tools.",
+    "Reload MCP servers or restart the target Hermes gateway, then confirm the read-only Shopify tools are available."
+  ]
+}
