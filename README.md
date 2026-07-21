@@ -24,6 +24,12 @@ Path: [`mcps/google-workspace`](mcps/google-workspace)
 
 A Gmail, Calendar, Drive, Docs, and Sheets MCP server with multiple profile-local Google accounts. It uses `HERMES_HOME/mcp-tokens/google-workspace`, supports explicit and default account selection, refreshes locally, and has no token-service dependency.
 
+#### QuickBooks Online
+
+Path: [`mcps/quickbooks-online`](mcps/quickbooks-online)
+
+A profile-local QuickBooks Online MCP server based on Intuit's official implementation. It provides broad entity and financial-report coverage, persists OAuth rotation under `HERMES_HOME/mcp-tokens/quickbooks-online`, and hides all create, update, and delete tools until an operator explicitly enables mutations.
+
 ### Skills
 
 #### Create Agent Profile
@@ -92,6 +98,17 @@ npm test
 
 See the component README for OAuth setup and profile configuration.
 
+## Build QuickBooks Online MCP
+
+```bash
+cd mcps/quickbooks-online
+npm ci
+npm test
+npm run audit:prod
+```
+
+See the component README for profile-local Intuit OAuth setup, Hermes configuration, tool filtering, and the explicit mutation opt-in.
+
 ## Install skills
 
 ```bash
@@ -124,6 +141,8 @@ Node tests:
 
 ```bash
 npm --prefix mcps/google-workspace test
+npm --prefix mcps/quickbooks-online test
+npm --prefix mcps/quickbooks-online run audit:prod
 ```
 
 Never commit OAuth tokens, client secrets, Slack tokens, signing secrets, profile `.env` files, or customer credentials.
