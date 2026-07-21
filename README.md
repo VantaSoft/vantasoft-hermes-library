@@ -30,6 +30,12 @@ Path: [`mcps/quickbooks-online`](mcps/quickbooks-online)
 
 A profile-local QuickBooks Online MCP server based on Intuit's official implementation. It provides broad entity and financial-report coverage, persists OAuth rotation under `HERMES_HOME/mcp-tokens/quickbooks-online`, and hides all create, update, and delete tools until an operator explicitly enables mutations.
 
+#### Amazon Selling Partner API
+
+Path: [`mcps/amazon-sp-api`](mcps/amazon-sp-api)
+
+A portable Amazon Seller Central and FBA MCP built on Amazon's official JavaScript SDK. It supports multiple profile-local seller stores, exposes 27 read/report tools by default, omits restricted buyer-data operations, and requires an explicit environment opt-in before listing patches or review solicitations are registered.
+
 ### Skills
 
 #### Create Agent Profile
@@ -88,15 +94,21 @@ hermes plugins install VantaSoft/vantasoft-hermes-library/plugins/agent-messagin
 
 Hermes supports installing a plugin from a repository subdirectory, but its current subdirectory update path does not retain Git metadata. Until that upstream limitation is fixed, update with `--force` using the same install command.
 
-## Build Google Workspace MCP
+## Build MCP servers
 
 ```bash
 cd mcps/google-workspace
 npm ci
 npm test
+
+cd ../amazon-sp-api
+npm ci
+npm test
+npm run lint
+npm audit --audit-level=high
 ```
 
-See the component README for OAuth setup and profile configuration.
+See each component README for credential setup and profile configuration.
 
 ## Build QuickBooks Online MCP
 
@@ -143,6 +155,9 @@ Node tests:
 npm --prefix mcps/google-workspace test
 npm --prefix mcps/quickbooks-online test
 npm --prefix mcps/quickbooks-online run audit:prod
+npm --prefix mcps/amazon-sp-api test
+npm --prefix mcps/amazon-sp-api run lint
+npm --prefix mcps/amazon-sp-api audit --audit-level=high
 ```
 
 Never commit OAuth tokens, client secrets, Slack tokens, signing secrets, profile `.env` files, or customer credentials.
