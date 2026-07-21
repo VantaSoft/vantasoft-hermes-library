@@ -11,6 +11,16 @@
       "supportsMultipleAccounts": true
     },
     {
+      "id": "quickbooks-online",
+      "name": "QuickBooks Online MCP",
+      "type": "mcp",
+      "path": "mcps/quickbooks-online",
+      "profileScoped": true,
+      "credentialModel": "HERMES_HOME/mcp-tokens/quickbooks-online/.env",
+      "safeDefault": "read-only",
+      "upstream": "intuit/quickbooks-online-mcp-server"
+    },
+    {
       "id": "agent-messaging",
       "name": "Agent Messaging",
       "type": "hermes-plugin",

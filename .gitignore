@@ -19,6 +19,7 @@ dist/
 # Secrets and local credentials
 .env
 .env.*
+!mcps/quickbooks-online/.env.example
 *.pem
 *.key
 credentials.json
