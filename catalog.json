@@ -21,6 +21,17 @@
       "upstream": "intuit/quickbooks-online-mcp-server"
     },
     {
+      "id": "shopify-admin",
+      "name": "Shopify Admin MCP",
+      "type": "mcp",
+      "path": "mcps/shopify-admin",
+      "profileScoped": true,
+      "credentialModel": "HERMES_HOME/mcp-tokens/shopify-admin/credentials.json",
+      "supportsMultipleAccounts": true,
+      "safeDefault": "read-only",
+      "upstreamClient": "@shopify/admin-api-client@1.1.2"
+    },
+    {
       "id": "agent-messaging",
       "name": "Agent Messaging",
       "type": "hermes-plugin",
