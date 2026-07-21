@@ -145,7 +145,7 @@ hermes skills install VantaSoft/vantasoft-hermes-library/install-vantasoft-mcp
 Then ask the agent to install a catalogued library MCP, or invoke the bundled installer directly:
 
 ```bash
-python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/install_mcp.py" \
   quickbooks-online \
   --hermes-home "${HERMES_HOME:-$HOME/.hermes}" \
   --ref main \

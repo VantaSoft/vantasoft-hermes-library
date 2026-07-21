@@ -43,7 +43,7 @@ Do not use this skill for arbitrary repositories, Hermes directory plugins, skil
 Resolve this installed skill's directory. Its normal location is:
 
 ```text
-${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp
+${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp
 ```
 
 The installer is:
@@ -74,7 +74,7 @@ The metadata file may not exist on a first install.
 Run the installer in dry-run mode first:
 
 ```bash
-python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/install_mcp.py" \
   <component-id> \
   --hermes-home "<target-HERMES_HOME>" \
   --ref "<tag-branch-or-commit>" \
@@ -88,7 +88,7 @@ Parse the JSON result. Confirm that the component ID, installation directory, MC
 For a first installation:
 
 ```bash
-python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/install_mcp.py" \
   <component-id> \
   --hermes-home "<target-HERMES_HOME>" \
   --ref "<tag-branch-or-commit>"
@@ -97,7 +97,7 @@ python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp
 For an explicitly approved update or reinstall, add `--force`:
 
 ```bash
-python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/install_mcp.py" \
   <component-id> \
   --hermes-home "<target-HERMES_HOME>" \
   --ref "<new-tag-branch-or-commit>" \
