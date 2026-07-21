@@ -1,0 +1,49 @@
+{
+  "name": "@vantasoft/amazon-sp-api-mcp",
+  "version": "1.0.0",
+  "description": "Portable Amazon Selling Partner API MCP server with profile-local multi-store credentials",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "amazon-sp-api-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "THIRD_PARTY.md",
+    "THIRD_PARTY_LICENSES",
+    "LICENSE",
+    "credentials.example.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "test:smoke": "npm run build && node --test test/mcp-smoke.test.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
+    "prepare": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@amazon-sp-api-release/amazon-sp-api-sdk-js": "1.9.0",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.1",
+    "@types/node": "24.10.1",
+    "eslint": "9.39.1",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "16.5.0",
+    "prettier": "3.7.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.50.0"
+  },
+  "overrides": {
+    "superagent": "10.2.2"
+  }
+}

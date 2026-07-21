@@ -21,6 +21,17 @@
       "upstream": "intuit/quickbooks-online-mcp-server"
     },
     {
+      "id": "amazon-sp-api",
+      "name": "Amazon Selling Partner API MCP",
+      "type": "mcp",
+      "path": "mcps/amazon-sp-api",
+      "profileScoped": true,
+      "credentialModel": "HERMES_HOME/mcp-tokens/amazon-sp-api/credentials.json",
+      "supportsMultipleAccounts": true,
+      "defaultReadOnly": true,
+      "upstreamSdk": "@amazon-sp-api-release/amazon-sp-api-sdk-js@1.9.0"
+    },
+    {
       "id": "agent-messaging",
       "name": "Agent Messaging",
       "type": "hermes-plugin",
