@@ -62,6 +62,12 @@ Path: [`skills/slack-app-manifest`](skills/slack-app-manifest)
 
 An a-la-carte Hermes skill containing the prompting, validated template, and deterministic generator for named Slack agents. It installs independently and registers no runtime integration tools.
 
+#### Install VantaSoft MCP
+
+Path: [`skills/install-vantasoft-mcp`](skills/install-vantasoft-mcp)
+
+A profile-aware installation workflow with a bundled deterministic installer. It retrieves one catalogued MCP subdirectory through Git sparse checkout, validates the component's `mcp-install.json`, runs its dependency installation, build, and smoke checks, writes the profile-local MCP configuration atomically, and leaves credential entry to the authorized operator's local machine.
+
 ## Mix and match by profile
 
 Components are independently configured in each Hermes profile.
@@ -127,6 +133,27 @@ npm audit --audit-level=high
 
 See the component README for multi-store credentials, Admin API scopes, Hermes configuration, privacy controls, and mutation gating.
 
+## Install an MCP into a Hermes profile
+
+Install the reusable workflow from the public tap:
+
+```bash
+hermes skills tap add VantaSoft/vantasoft-hermes-library
+hermes skills install VantaSoft/vantasoft-hermes-library/install-vantasoft-mcp
+```
+
+Then ask the agent to install a catalogued library MCP, or invoke the bundled installer directly:
+
+```bash
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+  quickbooks-online \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}" \
+  --ref main \
+  --dry-run
+```
+
+Remove `--dry-run` after reviewing the JSON plan. The installer records the exact resolved commit even when a branch name is supplied. It never accepts credential values, never overwrites an existing credential file, and requires `--force` before replacing an installed component. See the [`mcp-install.json` schema and component contract](docs/mcp-install-manifest.md) when adding another MCP.
+
 ## Install skills
 
 ```bash
@@ -135,6 +162,7 @@ hermes skills install VantaSoft/vantasoft-hermes-library/create-agent-profile
 hermes skills install VantaSoft/vantasoft-hermes-library/approval-gated-email
 hermes skills install VantaSoft/vantasoft-hermes-library/approval-gated-calendar
 hermes skills install VantaSoft/vantasoft-hermes-library/slack-app-manifest
+hermes skills install VantaSoft/vantasoft-hermes-library/install-vantasoft-mcp
 ```
 
 After installation, invoke a skill by name or ask the agent for the corresponding workflow. The approval-gated communication skills are designed for profiles using this repository's Google Workspace MCP.
@@ -145,7 +173,7 @@ Python formatting and tests:
 
 ```bash
 python -m ruff check plugins skills tests
-python -m pytest -q tests/test_slack_manifest.py tests/test_approval_gated_skills.py tests/test_create_agent_profile.py
+python -m pytest -q tests/test_slack_manifest.py tests/test_approval_gated_skills.py tests/test_create_agent_profile.py tests/test_install_vantasoft_mcp.py
 ```
 
 The `agent-messaging` suite must run against a compatible VantaSoft Hermes Agent checkout:

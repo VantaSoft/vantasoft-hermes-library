@@ -49,6 +49,20 @@ npm ci
 npm test
 ```
 
+### Install from the VantaSoft library
+
+The component includes [`mcp-install.json`](mcp-install.json) for the deterministic installer bundled with the `install-vantasoft-mcp` skill. After installing that skill from the VantaSoft tap, preview and install into the active profile with:
+
+```bash
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+  shopify-admin \
+  --hermes-home "${HERMES_HOME:-$HOME/.hermes}" \
+  --ref main \
+  --dry-run
+```
+
+Remove `--dry-run` after reviewing the plan. The installer downloads only this MCP subdirectory, builds, tests, lints, and audits it, installs it under `HERMES_HOME/mcp-installs/shopify-admin`, writes the Hermes MCP configuration, and creates the credential template only when it does not already exist. Mutations remain disabled.
+
 ## Credentials
 
 Credentials are loaded from the first applicable location:

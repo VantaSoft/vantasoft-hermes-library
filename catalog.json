@@ -6,6 +6,7 @@
       "name": "Google Workspace MCP",
       "type": "mcp",
       "path": "mcps/google-workspace",
+      "installManifest": "mcps/google-workspace/mcp-install.json",
       "profileScoped": true,
       "credentialModel": "HERMES_HOME/mcp-tokens/google-workspace",
       "supportsMultipleAccounts": true
@@ -15,6 +16,7 @@
       "name": "QuickBooks Online MCP",
       "type": "mcp",
       "path": "mcps/quickbooks-online",
+      "installManifest": "mcps/quickbooks-online/mcp-install.json",
       "profileScoped": true,
       "credentialModel": "HERMES_HOME/mcp-tokens/quickbooks-online/.env",
       "safeDefault": "read-only",
@@ -25,6 +27,7 @@
       "name": "Shopify Admin MCP",
       "type": "mcp",
       "path": "mcps/shopify-admin",
+      "installManifest": "mcps/shopify-admin/mcp-install.json",
       "profileScoped": true,
       "credentialModel": "HERMES_HOME/mcp-tokens/shopify-admin/credentials.json",
       "supportsMultipleAccounts": true,
@@ -43,6 +46,15 @@
         "message_agent",
         "agent_reply"
       ]
+    },
+    {
+      "id": "install-vantasoft-mcp",
+      "name": "Install VantaSoft MCP",
+      "type": "hermes-skill",
+      "path": "skills/install-vantasoft-mcp",
+      "profileScoped": true,
+      "runtimePlugin": false,
+      "installsComponentType": "mcp"
     },
     {
       "id": "create-agent-profile",

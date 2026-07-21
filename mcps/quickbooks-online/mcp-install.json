@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "componentId": "quickbooks-online",
+  "displayName": "QuickBooks Online MCP",
+  "safeDefault": "read-only",
+  "runtime": {
+    "command": "node",
+    "minimumVersion": "20.0.0",
+    "versionArgs": ["--version"]
+  },
+  "install": {
+    "bootstrap": [
+      ["npm", "ci", "--ignore-scripts"],
+      ["npm", "run", "build"],
+      ["npm", "run", "test:smoke"],
+      ["npm", "run", "audit:prod"],
+      ["npm", "prune", "--omit=dev", "--ignore-scripts"]
+    ],
+    "requiredFiles": ["dist/index.js", "dist/auth-server.js"]
+  },
+  "transport": {
+    "serverName": "quickbooks_online",
+    "command": "node",
+    "args": ["${INSTALL_DIR}/dist/index.js"],
+    "env": {
+      "QUICKBOOKS_ENABLE_MUTATIONS": "false"
+    },
+    "timeout": 120,
+    "connectTimeout": 30
+  },
+  "credentials": {
+    "directory": "mcp-tokens/quickbooks-online",
+    "template": ".env.example",
+    "target": "mcp-tokens/quickbooks-online/.env"
+  },
+  "nextSteps": [
+    "Review and complete ${CREDENTIAL_FILE} locally. Never send its values through chat.",
+    "For a sandbox Intuit app, authorize locally with: HERMES_HOME=${HERMES_HOME} npm --prefix ${INSTALL_DIR} run auth",
+    "For a production Intuit app, obtain the initial realm ID and refresh token through its approved HTTPS callback or Intuit OAuth tooling.",
+    "Reload MCP servers or restart the target Hermes gateway, then confirm the read-only QuickBooks tools are available."
+  ]
+}
