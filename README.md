@@ -30,6 +30,12 @@ Path: [`mcps/quickbooks-online`](mcps/quickbooks-online)
 
 A profile-local QuickBooks Online MCP server based on Intuit's official implementation. It provides broad entity and financial-report coverage, persists OAuth rotation under `HERMES_HOME/mcp-tokens/quickbooks-online`, and hides all create, update, and delete tools until an operator explicitly enables mutations.
 
+#### Shopify Admin
+
+Path: [`mcps/shopify-admin`](mcps/shopify-admin)
+
+A portable multi-store Shopify Admin GraphQL MCP built on Shopify's official client. It exposes 22 curated read tools by default, minimizes customer and order data, rejects arbitrary API hosts, and adds only six limited mutation tools after an explicit opt-in.
+
 ### Skills
 
 #### Create Agent Profile
@@ -109,6 +115,18 @@ npm run audit:prod
 
 See the component README for profile-local Intuit OAuth setup, Hermes configuration, tool filtering, and the explicit mutation opt-in.
 
+## Build Shopify Admin MCP
+
+```bash
+cd mcps/shopify-admin
+npm ci
+npm test
+npm run lint
+npm audit --audit-level=high
+```
+
+See the component README for multi-store credentials, Admin API scopes, Hermes configuration, privacy controls, and mutation gating.
+
 ## Install skills
 
 ```bash
@@ -143,6 +161,9 @@ Node tests:
 npm --prefix mcps/google-workspace test
 npm --prefix mcps/quickbooks-online test
 npm --prefix mcps/quickbooks-online run audit:prod
+npm --prefix mcps/shopify-admin test
+npm --prefix mcps/shopify-admin run lint
+npm --prefix mcps/shopify-admin audit --audit-level=high
 ```
 
 Never commit OAuth tokens, client secrets, Slack tokens, signing secrets, profile `.env` files, or customer credentials.
