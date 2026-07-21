@@ -104,6 +104,8 @@ def test_skill_is_installable_and_points_to_bundled_installer():
     assert metadata["version"] == "1.0.0"
     assert metadata["metadata"]["hermes"]["category"] == "integrations"
     assert "scripts/install_mcp.py" in body
+    assert "skills/install-vantasoft-mcp/scripts/install_mcp.py" in body
+    assert "skills/integrations/install-vantasoft-mcp" not in body
     assert "Never ask the user to paste OAuth client secrets" in body
     assert INSTALLER.is_file()
 

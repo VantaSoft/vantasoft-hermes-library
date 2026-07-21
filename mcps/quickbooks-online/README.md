@@ -50,7 +50,7 @@ npm run audit:prod
 The component includes [`mcp-install.json`](mcp-install.json) for the deterministic installer bundled with the `install-vantasoft-mcp` skill. After installing that skill from the VantaSoft tap, preview and install into the active profile with:
 
 ```bash
-python3 "${HERMES_HOME:-$HOME/.hermes}/skills/integrations/install-vantasoft-mcp/scripts/install_mcp.py" \
+python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/install_mcp.py" \
   quickbooks-online \
   --hermes-home "${HERMES_HOME:-$HOME/.hermes}" \
   --ref main \
