@@ -8,7 +8,8 @@ I evaluated the active open-source QBO MCP implementations before importing this
 
 The VantaSoft version adds the deployment properties we need:
 
-• Credentials and rotated refresh tokens default to `HERMES_HOME/mcp-tokens/quickbooks-online/.env`.
+• Customer deployments use a unique VAS broker credential; VantaSoft's Intuit Client Secret and customer refresh token remain central.
+• Internal standalone credentials and rotated refresh tokens default to `HERMES_HOME/mcp-tokens/quickbooks-online/.env`.
 • Read tools are enabled by default, while create, update, and delete tools remain hidden unless an operator explicitly enables mutations.
 • QBO upload errors are sanitized before logging so response bodies cannot leak company or account details.
 • Initial OAuth binds only to `localhost`, validates a cryptographically random `state`, accepts only `GET /callback`, and never logs the authorization-code query string.
@@ -59,7 +60,23 @@ python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/inst
 
 Remove `--dry-run` after reviewing the plan. The installer downloads only this MCP subdirectory, runs `npm ci`, builds it, executes its stdio smoke test, installs it under `HERMES_HOME/mcp-installs/quickbooks-online`, writes the Hermes MCP configuration, and creates the credential template only when it does not already exist. Mutations remain disabled.
 
-## Profile-local credential setup
+## Customer broker credential setup
+
+External customer deployments must use the centralized VAS broker. The profile-local credential file contains only:
+
+```dotenv
+QUICKBOOKS_BROKER_URL=https://quickbooks.vantasoft.com
+QUICKBOOKS_CONNECTION_ID=<customer-connection-uuid>
+QUICKBOOKS_BROKER_TOKEN=<unique-customer-broker-token>
+```
+
+Provision this file through the broker operator after the customer completes centralized OAuth. The MCP sends the customer-specific broker token to the VAS read-only proxy. Intuit app credentials, refresh tokens, access-token refresh, rotation, and Realm IDs remain in the broker.
+
+The broker rejects every non-GET QuickBooks request even if mutation tools are accidentally enabled on a customer host.
+
+## Internal standalone credential setup
+
+Standalone mode is only for an owner-controlled backend or internal profile. It must not be deployed to an external customer host because it stores the Intuit app Client Secret and refresh token locally.
 
 Create a QuickBooks Online app in the [Intuit Developer Portal](https://developer.intuit.com/), then prepare the active Hermes profile's token file:
 
@@ -82,7 +99,7 @@ npm run auth
 
 The helper saves the realm ID and refresh token to the active profile's token file. Refresh-token rotation is persisted there automatically.
 
-Production Intuit apps require an approved HTTPS callback for the initial authorization. Use Intuit's OAuth tooling or another approved HTTPS callback flow to obtain the initial production refresh token and realm ID. After that bootstrap, the server refreshes and rotates tokens locally.
+Production Intuit apps require an approved HTTPS callback for the initial authorization. Use the centralized VAS broker for multi-customer production access. The local production bootstrap remains available only for an internal owner-controlled profile.
 
 ### Credential path precedence
 
@@ -102,6 +119,7 @@ mcp_servers:
       - /absolute/path/to/vantasoft-hermes-library/mcps/quickbooks-online/dist/index.js
     env:
       QUICKBOOKS_ENABLE_MUTATIONS: "false"
+      QUICKBOOKS_ENV_FILE: /absolute/path/to/hermes/profile/mcp-tokens/quickbooks-online/.env
 ```
 
 Restart the profile or run `/reload-mcp`, then confirm the expected `mcp_quickbooks_online_*` tools are available.

@@ -39,12 +39,25 @@ const client_secret = process.env.QUICKBOOKS_CLIENT_SECRET;
 const refresh_token = process.env.QUICKBOOKS_REFRESH_TOKEN;
 const realm_id = process.env.QUICKBOOKS_REALM_ID;
 const environment = process.env.QUICKBOOKS_ENVIRONMENT || "sandbox";
+const broker_url = process.env.QUICKBOOKS_BROKER_URL;
+const broker_connection_id = process.env.QUICKBOOKS_CONNECTION_ID;
+const broker_token = process.env.QUICKBOOKS_BROKER_TOKEN;
 // Fix for Issue #5: Use env var with underscore (QUICKBOOKS_REDIRECT_URI)
 const redirect_uri =
   process.env.QUICKBOOKS_REDIRECT_URI || "http://localhost:8000/callback";
 
-// Only throw error if client_id or client_secret is missing
-if (!client_id || !client_secret || !redirect_uri) {
+const brokerValues = [broker_url, broker_connection_id, broker_token];
+const brokerMode = brokerValues.every((item) => Boolean(item));
+const partialBrokerMode = brokerValues.some((item) => Boolean(item)) && !brokerMode;
+
+if (partialBrokerMode) {
+  throw Error(
+    "QUICKBOOKS_BROKER_URL, QUICKBOOKS_CONNECTION_ID and QUICKBOOKS_BROKER_TOKEN must be set together",
+  );
+}
+
+// Standalone mode owns OAuth locally. Broker mode deliberately does not.
+if (!brokerMode && (!client_id || !client_secret || !redirect_uri)) {
   throw Error(
     "Client ID, Client Secret and Redirect URI must be set in environment variables",
   );
@@ -63,9 +76,12 @@ export class QuickbooksClient {
   private accessToken?: string;
   private accessTokenExpiry?: Date;
   private quickbooksInstance?: QuickBooks;
-  private oauthClient: OAuthClient;
+  private oauthClient?: OAuthClient;
   private isAuthenticating: boolean = false;
   private redirectUri: string;
+  private readonly brokerUrl?: string;
+  private readonly brokerConnectionId?: string;
+  private readonly brokerToken?: string;
 
   // Refresh 5 minutes before actual expiry to avoid edge cases
   private static readonly TOKEN_REFRESH_BUFFER_MS = 5 * 60 * 1000;
@@ -84,19 +100,57 @@ export class QuickbooksClient {
   private authInFlight?: Promise<QuickBooks>;
 
   constructor(config: {
-    clientId: string;
-    clientSecret: string;
+    clientId?: string;
+    clientSecret?: string;
     refreshToken?: string;
     realmId?: string;
     environment: string;
-    redirectUri: string;
+    redirectUri?: string;
+    brokerUrl?: string;
+    brokerConnectionId?: string;
+    brokerToken?: string;
   }) {
-    this.clientId = config.clientId;
-    this.clientSecret = config.clientSecret;
+    this.clientId = config.clientId ?? "";
+    this.clientSecret = config.clientSecret ?? "";
     this.refreshToken = config.refreshToken;
     this.realmId = config.realmId;
     this.environment = config.environment;
-    this.redirectUri = config.redirectUri;
+    this.redirectUri = config.redirectUri ?? "";
+    this.brokerUrl = config.brokerUrl;
+    this.brokerConnectionId = config.brokerConnectionId;
+    this.brokerToken = config.brokerToken;
+
+    if (this.brokerUrl || this.brokerConnectionId || this.brokerToken) {
+      if (!this.brokerUrl || !this.brokerConnectionId || !this.brokerToken) {
+        throw new Error("incomplete QuickBooks broker configuration");
+      }
+      const parsed = new URL(this.brokerUrl);
+      if (
+        parsed.protocol !== "https:" ||
+        parsed.username ||
+        parsed.password ||
+        parsed.search ||
+        parsed.hash ||
+        (parsed.pathname !== "/" && parsed.pathname !== "")
+      ) {
+        throw new Error("QUICKBOOKS_BROKER_URL must be an HTTPS origin");
+      }
+      if (
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(
+          this.brokerConnectionId,
+        )
+      ) {
+        throw new Error("QUICKBOOKS_CONNECTION_ID must be a UUID");
+      }
+      if (!/^[A-Za-z0-9_-]{32,256}$/.test(this.brokerToken)) {
+        throw new Error("QUICKBOOKS_BROKER_TOKEN is invalid");
+      }
+      return;
+    }
+
+    if (!this.clientId || !this.clientSecret || !this.redirectUri) {
+      throw new Error("standalone QuickBooks OAuth configuration is incomplete");
+    }
     this.oauthClient = new OAuthClient({
       clientId: this.clientId,
       clientSecret: this.clientSecret,
@@ -105,7 +159,35 @@ export class QuickbooksClient {
     });
   }
 
+  private isBrokerMode(): boolean {
+    return Boolean(
+      this.brokerUrl && this.brokerConnectionId && this.brokerToken,
+    );
+  }
+
+  private buildBrokerInstance(): QuickBooks {
+    if (!this.brokerUrl || !this.brokerConnectionId || !this.brokerToken) {
+      throw new Error("QuickBooks broker configuration is incomplete");
+    }
+    const instance = new QuickBooks(
+      "broker",
+      "broker",
+      this.brokerToken,
+      false,
+      this.brokerConnectionId,
+      false,
+      false,
+      undefined,
+      "2.0",
+      undefined,
+    );
+    (instance as QuickBooks & { endpoint: string }).endpoint =
+      `${new URL(this.brokerUrl).origin}/v1/qbo/`;
+    return instance;
+  }
+
   private isTokenExpiredOrExpiringSoon(): boolean {
+    if (this.isBrokerMode()) return !this.quickbooksInstance;
     if (!this.accessToken || !this.accessTokenExpiry) return true;
     return (
       this.accessTokenExpiry <=
@@ -391,7 +473,7 @@ export class QuickbooksClient {
     this.refreshInFlight = (async () => {
       try {
         // At this point we know refreshToken is not undefined
-        const authResponse = await this.oauthClient.refreshUsingToken(
+        const authResponse = await this.oauthClient!.refreshUsingToken(
           this.refreshToken!,
         );
 
@@ -464,6 +546,10 @@ export class QuickbooksClient {
 
     this.authInFlight = (async () => {
       try {
+        if (this.isBrokerMode()) {
+          this.quickbooksInstance ??= this.buildBrokerInstance();
+          return this.quickbooksInstance;
+        }
         if (!this.refreshToken || !this.realmId) {
           await this.startOAuthFlow();
 
@@ -538,6 +624,11 @@ export class QuickbooksClient {
     realmId: string;
     isSandbox: boolean;
   }> {
+    if (quickbooksClient.isBrokerMode()) {
+      throw new Error(
+        "Raw QuickBooks OAuth credentials are unavailable in broker mode",
+      );
+    }
     if (
       quickbooksClient.isTokenExpiredOrExpiringSoon() ||
       !quickbooksClient.accessToken
@@ -571,4 +662,7 @@ export const quickbooksClient = new QuickbooksClient({
   realmId: realm_id,
   environment: environment,
   redirectUri: redirect_uri,
+  brokerUrl: broker_url,
+  brokerConnectionId: broker_connection_id,
+  brokerToken: broker_token,
 });
