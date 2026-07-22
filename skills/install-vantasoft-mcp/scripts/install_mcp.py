@@ -406,7 +406,15 @@ def _build_server_config(
         ],
     }
     if transport.get("env"):
-        config["env"] = dict(transport["env"])
+        config["env"] = {
+            key: _expand(
+                value,
+                install_dir=install_dir,
+                hermes_home=hermes_home,
+                credential_file=credential_file,
+            )
+            for key, value in transport["env"].items()
+        }
     if transport.get("timeout"):
         config["timeout"] = transport["timeout"]
     if transport.get("connectTimeout"):
