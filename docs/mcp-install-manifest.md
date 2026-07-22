@@ -49,7 +49,8 @@ Current manifests use `schemaVersion: 1`:
     "command": "node",
     "args": ["${INSTALL_DIR}/dist/index.js"],
     "env": {
-      "EXAMPLE_SAFE_MODE": "true"
+      "EXAMPLE_SAFE_MODE": "true",
+      "EXAMPLE_CREDENTIAL_FILE": "${CREDENTIAL_FILE}"
     },
     "timeout": 120,
     "connectTimeout": 30
@@ -98,11 +99,11 @@ Use lockfile-based dependency installation. Run the component's real build and t
 • `serverName`: key written under `mcp_servers` in the target profile.
 • `command`: stdio process command.
 • `args`: stdio process arguments.
-• `env`: optional non-secret runtime defaults. Never put credentials here.
+• `env`: optional non-secret runtime defaults and resolved paths. Never put credential values here.
 • `timeout`: optional tool-call timeout in seconds.
 • `connectTimeout`: optional initial connection timeout in seconds.
 
-`command`, `args`, and `nextSteps` may use:
+`command`, `args`, `env` values, and `nextSteps` may use:
 
 • `${INSTALL_DIR}`: final profile-local component directory.
 • `${HERMES_HOME}`: target profile directory.

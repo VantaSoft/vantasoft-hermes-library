@@ -74,7 +74,12 @@ def _write_fake_library(root: Path, *, failing: bool = False) -> None:
                     "serverName": "demo_mcp",
                     "command": "${INSTALL_DIR}/dist/server.py",
                     "args": [],
-                    "env": {"DEMO_MODE": "safe"},
+                    "env": {
+                        "DEMO_MODE": "safe",
+                        "DEMO_CREDENTIAL_FILE": "${CREDENTIAL_FILE}",
+                        "DEMO_HOME": "${HERMES_HOME}",
+                        "DEMO_INSTALL": "${INSTALL_DIR}",
+                    },
                     "timeout": 45,
                     "connectTimeout": 12,
                 },
@@ -214,7 +219,12 @@ def test_install_builds_component_writes_config_and_preserves_credentials(tmp_pa
     assert server == {
         "command": str(install_dir / "dist" / "server.py"),
         "args": [],
-        "env": {"DEMO_MODE": "safe"},
+        "env": {
+            "DEMO_MODE": "safe",
+            "DEMO_CREDENTIAL_FILE": str(credential),
+            "DEMO_HOME": str(home),
+            "DEMO_INSTALL": str(install_dir),
+        },
         "timeout": 45,
         "connect_timeout": 12,
     }
