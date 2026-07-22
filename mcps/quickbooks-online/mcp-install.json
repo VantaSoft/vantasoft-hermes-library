@@ -23,7 +23,8 @@
     "command": "node",
     "args": ["${INSTALL_DIR}/dist/index.js"],
     "env": {
-      "QUICKBOOKS_ENABLE_MUTATIONS": "false"
+      "QUICKBOOKS_ENABLE_MUTATIONS": "false",
+      "QUICKBOOKS_ENV_FILE": "${CREDENTIAL_FILE}"
     },
     "timeout": 120,
     "connectTimeout": 30
@@ -34,9 +35,8 @@
     "target": "mcp-tokens/quickbooks-online/.env"
   },
   "nextSteps": [
-    "Review and complete ${CREDENTIAL_FILE} locally. Never send its values through chat.",
-    "For a sandbox Intuit app, authorize locally with: HERMES_HOME=${HERMES_HOME} npm --prefix ${INSTALL_DIR} run auth",
-    "For a production Intuit app, obtain the initial realm ID and refresh token through its approved HTTPS callback or Intuit OAuth tooling.",
+    "For a customer deployment, provision QUICKBOOKS_BROKER_URL, QUICKBOOKS_CONNECTION_ID, and QUICKBOOKS_BROKER_TOKEN through the VAS broker operator.",
+    "Use standalone Intuit app credentials only on an owner-controlled backend or internal profile.",
     "Reload MCP servers or restart the target Hermes gateway, then confirm the read-only QuickBooks tools are available."
   ]
 }
