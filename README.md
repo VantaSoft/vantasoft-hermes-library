@@ -36,6 +36,12 @@ Path: [`mcps/shopify-admin`](mcps/shopify-admin)
 
 A portable multi-store Shopify Admin GraphQL MCP built on Shopify's official client. It exposes 22 curated read tools by default, minimizes customer and order data, rejects arbitrary API hosts, and adds only six limited mutation tools after an explicit opt-in.
 
+#### Telvana Admin
+
+Path: [`mcps/telvana-admin`](mcps/telvana-admin)
+
+A workspace-scoped Telvana administration MCP with explicit development, staging, or production selection; read-only defaults; two-part mutation authorization; no destructive tools; sanitized API failures; and metadata-only JSONL audit records.
+
 ### Skills
 
 #### Create Agent Profile
@@ -131,7 +137,19 @@ npm run lint
 npm audit --audit-level=high
 ```
 
-See the component README for multi-store credentials, Admin API scopes, Hermes configuration, privacy controls, and mutation gating.
+See the component README for multi-store credentials, Admin API scopes, profile configuration, privacy controls, and mutation gating.
+
+## Build Telvana Admin MCP
+
+```bash
+cd mcps/telvana-admin
+npm ci
+npm test
+npm run lint
+npm run audit:prod
+```
+
+See the component README for workspace-scoped API keys, explicit environment selection, mutation authorization, audit records, staging smoke verification, rollback, and credential rotation.
 
 ## Install an MCP into a Hermes profile
 
@@ -192,6 +210,9 @@ npm --prefix mcps/quickbooks-online run audit:prod
 npm --prefix mcps/shopify-admin test
 npm --prefix mcps/shopify-admin run lint
 npm --prefix mcps/shopify-admin audit --audit-level=high
+npm --prefix mcps/telvana-admin test
+npm --prefix mcps/telvana-admin run lint
+npm --prefix mcps/telvana-admin run audit:prod
 ```
 
 Never commit OAuth tokens, client secrets, Slack tokens, signing secrets, profile `.env` files, or customer credentials.

@@ -1,0 +1,52 @@
+{
+  "name": "@vantasoft/telvana-admin-mcp",
+  "version": "1.0.0",
+  "description": "Read-only-by-default MCP for workspace-scoped Telvana administration",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "telvana-admin-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "scripts",
+    "README.md",
+    "LICENSE",
+    "credentials.example.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
+    "smoke:staging": "npm run build && node scripts/staging-smoke.mjs",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "telvana",
+    "administration",
+    "mcp",
+    "model-context-protocol"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.1",
+    "@types/node": "24.10.1",
+    "eslint": "9.39.1",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "16.5.0",
+    "prettier": "3.7.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.50.0"
+  }
+}

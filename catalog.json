@@ -35,6 +35,17 @@
       "upstreamClient": "@shopify/admin-api-client@1.1.2"
     },
     {
+      "id": "telvana-admin",
+      "name": "Telvana Admin MCP",
+      "type": "mcp",
+      "path": "mcps/telvana-admin",
+      "installManifest": "mcps/telvana-admin/mcp-install.json",
+      "profileScoped": true,
+      "credentialModel": "HERMES_HOME/mcp-tokens/telvana-admin/credentials.json",
+      "safeDefault": "read-only",
+      "supportsEnvironments": ["development", "staging", "production"]
+    },
+    {
       "id": "agent-messaging",
       "name": "Agent Messaging",
       "type": "hermes-plugin",

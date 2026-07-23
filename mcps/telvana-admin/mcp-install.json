@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "componentId": "telvana-admin",
+  "displayName": "Telvana Admin MCP",
+  "safeDefault": "read-only",
+  "runtime": {
+    "command": "node",
+    "minimumVersion": "20.0.0",
+    "versionArgs": ["--version"]
+  },
+  "install": {
+    "bootstrap": [
+      ["npm", "ci", "--ignore-scripts"],
+      ["npm", "test"],
+      ["npm", "run", "lint"],
+      ["npm", "run", "audit:prod"],
+      ["npm", "prune", "--omit=dev", "--ignore-scripts"]
+    ],
+    "requiredFiles": ["dist/index.js"]
+  },
+  "transport": {
+    "serverName": "telvana_admin",
+    "command": "node",
+    "args": ["${INSTALL_DIR}/dist/index.js"],
+    "env": {
+      "TELVANA_ENABLE_MUTATIONS": "false",
+      "TELVANA_ALLOW_PRODUCTION": "false"
+    },
+    "timeout": 120,
+    "connectTimeout": 30
+  },
+  "credentials": {
+    "directory": "mcp-tokens/telvana-admin",
+    "template": "credentials.example.json",
+    "target": "mcp-tokens/telvana-admin/credentials.json"
+  },
+  "nextSteps": [
+    "Complete ${CREDENTIAL_FILE} locally with a least-privilege workspace API key. Never send its values through chat.",
+    "Set TELVANA_ENVIRONMENT and TELVANA_MCP_ACTOR in the installed server configuration. Keep mutations and production disabled until separately authorized.",
+    "Reload MCP servers or restart the target Hermes gateway, then confirm the read-only Telvana tools are available."
+  ]
+}
