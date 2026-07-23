@@ -8,8 +8,9 @@ I evaluated the active open-source QBO MCP implementations before importing this
 
 The VantaSoft version adds the deployment properties we need:
 
-• Customer deployments use a unique VAS broker credential; VantaSoft's Intuit Client Secret and customer refresh token remain central.
-• Internal standalone credentials and rotated refresh tokens default to `HERMES_HOME/mcp-tokens/quickbooks-online/.env`.
+• New customer deployments use a unique OAuth Relay credential; VantaSoft's Intuit Client Secret remains central while customer access and refresh tokens are persisted locally.
+• Legacy centralized broker mode remains available for controlled migration of existing connections.
+• Relay and internal standalone token state defaults to `HERMES_HOME/mcp-tokens/quickbooks-online/.env`.
 • Read tools are enabled by default, while create, update, and delete tools remain hidden unless an operator explicitly enables mutations.
 • QBO upload errors are sanitized before logging so response bodies cannot leak company or account details.
 • Initial OAuth binds only to `localhost`, validates a cryptographically random `state`, accepts only `GET /callback`, and never logs the authorization-code query string.
@@ -60,19 +61,24 @@ python3 "${HERMES_HOME:-$HOME/.hermes}/skills/install-vantasoft-mcp/scripts/inst
 
 Remove `--dry-run` after reviewing the plan. The installer downloads only this MCP subdirectory, runs `npm ci`, builds it, executes its stdio smoke test, installs it under `HERMES_HOME/mcp-installs/quickbooks-online`, writes the Hermes MCP configuration, and creates the credential template only when it does not already exist. Mutations remain disabled.
 
-## Customer broker credential setup
+## Customer OAuth Relay setup
 
-External customer deployments must use the centralized VAS broker. The profile-local credential file contains only:
+New customer deployments use the VantaSoft OAuth Relay. The initial profile-local credential file contains:
 
 ```dotenv
-QUICKBOOKS_BROKER_URL=https://quickbooks.vantasoft.com
-QUICKBOOKS_CONNECTION_ID=<customer-connection-uuid>
-QUICKBOOKS_BROKER_TOKEN=<unique-customer-broker-token>
+OAUTH_RELAY_URL=https://oauth.vantasoft.com
+OAUTH_CONNECTION_ID=<customer-connection-uuid>
+OAUTH_RELAY_TOKEN=<deployment-scoped-relay-token>
+QUICKBOOKS_ENVIRONMENT=production
 ```
 
-Provision this file through the broker operator after the customer completes centralized OAuth. The MCP sends the customer-specific broker token to the VAS read-only proxy. Intuit app credentials, refresh tokens, access-token refresh, rotation, and Realm IDs remain in the broker.
+Provision this file through the relay operator before the customer authorizes Intuit. After authorization, the MCP retrieves the one-time encrypted handoff, atomically persists the access token, refresh token, expiration, and Realm ID, then acknowledges delivery. The relay deletes its token ciphertext after acknowledgment.
 
-The broker rejects every non-GET QuickBooks request even if mutation tools are accidentally enabled on a customer host.
+The MCP calls QBO directly with the local access token. When refresh is required, it sends the current refresh token to the relay, which adds VantaSoft's Intuit Client Secret and returns the rotated token bundle through another acknowledged handoff. A filesystem lock and stable idempotency key prevent concurrent consumers from racing Intuit's rotating refresh token.
+
+### Legacy centralized broker mode
+
+Existing connections can continue using `QUICKBOOKS_BROKER_URL`, `QUICKBOOKS_CONNECTION_ID`, and `QUICKBOOKS_BROKER_TOKEN` until a controlled migration is approved. Do not replace a live profile's broker variables manually. Broker mode continues to route through the central read-only proxy and exposes no raw Intuit tokens on that host.
 
 ## Internal standalone credential setup
 
@@ -99,7 +105,7 @@ npm run auth
 
 The helper saves the realm ID and refresh token to the active profile's token file. Refresh-token rotation is persisted there automatically.
 
-Production Intuit apps require an approved HTTPS callback for the initial authorization. Use the centralized VAS broker for multi-customer production access. The local production bootstrap remains available only for an internal owner-controlled profile.
+Production Intuit apps require an approved HTTPS callback for the initial authorization. Use the VantaSoft OAuth Relay for customer production access. The local production bootstrap remains available only for an internal owner-controlled profile.
 
 ### Credential path precedence
 

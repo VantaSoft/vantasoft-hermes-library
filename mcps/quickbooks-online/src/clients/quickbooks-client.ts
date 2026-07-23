@@ -11,6 +11,10 @@ import {
   ensureCredentialDirectory,
   resolveCredentialFile,
 } from "../helpers/credential-path.js";
+import {
+  OAuthRelayClient,
+  RelayTokenBundle,
+} from "./oauth-relay-client.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const installRoot = path.join(__dirname, "..", "..");
@@ -38,10 +42,16 @@ const client_id = process.env.QUICKBOOKS_CLIENT_ID;
 const client_secret = process.env.QUICKBOOKS_CLIENT_SECRET;
 const refresh_token = process.env.QUICKBOOKS_REFRESH_TOKEN;
 const realm_id = process.env.QUICKBOOKS_REALM_ID;
+const access_token = process.env.QUICKBOOKS_ACCESS_TOKEN;
+const access_token_expires_at = process.env.QUICKBOOKS_ACCESS_TOKEN_EXPIRES_AT;
 const environment = process.env.QUICKBOOKS_ENVIRONMENT || "sandbox";
 const broker_url = process.env.QUICKBOOKS_BROKER_URL;
 const broker_connection_id = process.env.QUICKBOOKS_CONNECTION_ID;
 const broker_token = process.env.QUICKBOOKS_BROKER_TOKEN;
+const oauth_relay_url = process.env.OAUTH_RELAY_URL;
+const oauth_connection_id = process.env.OAUTH_CONNECTION_ID;
+const oauth_relay_token = process.env.OAUTH_RELAY_TOKEN;
+const oauth_pending_handoff_id = process.env.OAUTH_PENDING_HANDOFF_ID;
 // Fix for Issue #5: Use env var with underscore (QUICKBOOKS_REDIRECT_URI)
 const redirect_uri =
   process.env.QUICKBOOKS_REDIRECT_URI || "http://localhost:8000/callback";
@@ -49,15 +59,31 @@ const redirect_uri =
 const brokerValues = [broker_url, broker_connection_id, broker_token];
 const brokerMode = brokerValues.every((item) => Boolean(item));
 const partialBrokerMode = brokerValues.some((item) => Boolean(item)) && !brokerMode;
+const relayValues = [oauth_relay_url, oauth_connection_id, oauth_relay_token];
+const relayMode = relayValues.every((item) => Boolean(item));
+const partialRelayMode = relayValues.some((item) => Boolean(item)) && !relayMode;
 
 if (partialBrokerMode) {
   throw Error(
     "QUICKBOOKS_BROKER_URL, QUICKBOOKS_CONNECTION_ID and QUICKBOOKS_BROKER_TOKEN must be set together",
   );
 }
+if (partialRelayMode) {
+  throw Error(
+    "OAUTH_RELAY_URL, OAUTH_CONNECTION_ID and OAUTH_RELAY_TOKEN must be set together",
+  );
+}
+if (brokerMode && relayMode) {
+  throw Error("QuickBooks broker mode and OAuth relay mode are mutually exclusive");
+}
 
-// Standalone mode owns OAuth locally. Broker mode deliberately does not.
-if (!brokerMode && (!client_id || !client_secret || !redirect_uri)) {
+// Standalone mode owns the Intuit app secret locally. Relay mode owns only the
+// rotating customer token state; broker mode owns neither.
+if (
+  !brokerMode &&
+  !relayMode &&
+  (!client_id || !client_secret || !redirect_uri)
+) {
   throw Error(
     "Client ID, Client Secret and Redirect URI must be set in environment variables",
   );
@@ -82,6 +108,11 @@ export class QuickbooksClient {
   private readonly brokerUrl?: string;
   private readonly brokerConnectionId?: string;
   private readonly brokerToken?: string;
+  private readonly relayUrl?: string;
+  private readonly relayConnectionId?: string;
+  private readonly relayToken?: string;
+  private readonly relayClient?: OAuthRelayClient;
+  private pendingRelayHandoffId?: string;
 
   // Refresh 5 minutes before actual expiry to avoid edge cases
   private static readonly TOKEN_REFRESH_BUFFER_MS = 5 * 60 * 1000;
@@ -104,21 +135,43 @@ export class QuickbooksClient {
     clientSecret?: string;
     refreshToken?: string;
     realmId?: string;
+    accessToken?: string;
+    accessTokenExpiresAt?: string;
     environment: string;
     redirectUri?: string;
     brokerUrl?: string;
     brokerConnectionId?: string;
     brokerToken?: string;
+    relayUrl?: string;
+    relayConnectionId?: string;
+    relayToken?: string;
+    pendingRelayHandoffId?: string;
   }) {
     this.clientId = config.clientId ?? "";
     this.clientSecret = config.clientSecret ?? "";
     this.refreshToken = config.refreshToken;
     this.realmId = config.realmId;
+    this.accessToken = config.accessToken;
+    const accessTokenExpirySeconds = Number(config.accessTokenExpiresAt);
+    if (Number.isSafeInteger(accessTokenExpirySeconds) && accessTokenExpirySeconds > 0) {
+      this.accessTokenExpiry = new Date(accessTokenExpirySeconds * 1000);
+    }
     this.environment = config.environment;
     this.redirectUri = config.redirectUri ?? "";
     this.brokerUrl = config.brokerUrl;
     this.brokerConnectionId = config.brokerConnectionId;
     this.brokerToken = config.brokerToken;
+    this.relayUrl = config.relayUrl;
+    this.relayConnectionId = config.relayConnectionId;
+    this.relayToken = config.relayToken;
+    this.pendingRelayHandoffId = config.pendingRelayHandoffId;
+
+    if (
+      (this.brokerUrl || this.brokerConnectionId || this.brokerToken) &&
+      (this.relayUrl || this.relayConnectionId || this.relayToken)
+    ) {
+      throw new Error("QuickBooks broker mode and OAuth relay mode are mutually exclusive");
+    }
 
     if (this.brokerUrl || this.brokerConnectionId || this.brokerToken) {
       if (!this.brokerUrl || !this.brokerConnectionId || !this.brokerToken) {
@@ -148,6 +201,18 @@ export class QuickbooksClient {
       return;
     }
 
+    if (this.relayUrl || this.relayConnectionId || this.relayToken) {
+      if (!this.relayUrl || !this.relayConnectionId || !this.relayToken) {
+        throw new Error("incomplete OAuth relay configuration");
+      }
+      this.relayClient = new OAuthRelayClient(
+        this.relayUrl,
+        this.relayConnectionId,
+        this.relayToken,
+      );
+      return;
+    }
+
     if (!this.clientId || !this.clientSecret || !this.redirectUri) {
       throw new Error("standalone QuickBooks OAuth configuration is incomplete");
     }
@@ -163,6 +228,10 @@ export class QuickbooksClient {
     return Boolean(
       this.brokerUrl && this.brokerConnectionId && this.brokerToken,
     );
+  }
+
+  private isRelayMode(): boolean {
+    return Boolean(this.relayClient);
   }
 
   private buildBrokerInstance(): QuickBooks {
@@ -381,6 +450,9 @@ export class QuickbooksClient {
     const envLines = envContent.split("\n");
 
     const updateEnvVar = (name: string, value: string) => {
+      if (/[\r\n]/.test(value)) {
+        throw new Error(`Refusing to persist invalid ${name}`);
+      }
       const index = envLines.findIndex((line) => line.startsWith(`${name}=`));
       if (index !== -1) {
         envLines[index] = `${name}=${value}`;
@@ -388,10 +460,29 @@ export class QuickbooksClient {
         envLines.push(`${name}=${value}`);
       }
     };
+    const removeEnvVar = (name: string) => {
+      for (let index = envLines.length - 1; index >= 0; index -= 1) {
+        if (envLines[index]?.startsWith(`${name}=`)) envLines.splice(index, 1);
+      }
+    };
 
     if (this.refreshToken)
       updateEnvVar("QUICKBOOKS_REFRESH_TOKEN", this.refreshToken);
     if (this.realmId) updateEnvVar("QUICKBOOKS_REALM_ID", this.realmId);
+    if (this.accessToken)
+      updateEnvVar("QUICKBOOKS_ACCESS_TOKEN", this.accessToken);
+    if (this.accessTokenExpiry)
+      updateEnvVar(
+        "QUICKBOOKS_ACCESS_TOKEN_EXPIRES_AT",
+        Math.floor(this.accessTokenExpiry.getTime() / 1000).toString(),
+      );
+    if (this.isRelayMode()) {
+      if (this.pendingRelayHandoffId) {
+        updateEnvVar("OAUTH_PENDING_HANDOFF_ID", this.pendingRelayHandoffId);
+      } else {
+        removeEnvVar("OAUTH_PENDING_HANDOFF_ID");
+      }
+    }
 
     const newContent = envLines.join("\n");
     const isSymlink = this.isSymbolicLink(tokenPath);
@@ -456,7 +547,163 @@ export class QuickbooksClient {
     }
   }
 
+  private reloadRelayTokenState(): void {
+    if (!fs.existsSync(credentialFile)) return;
+    const parsed = dotenv.parse(fs.readFileSync(credentialFile, "utf-8"));
+    this.refreshToken = parsed.QUICKBOOKS_REFRESH_TOKEN || undefined;
+    this.realmId = parsed.QUICKBOOKS_REALM_ID || undefined;
+    this.accessToken = parsed.QUICKBOOKS_ACCESS_TOKEN || undefined;
+    const expiresAt = Number(parsed.QUICKBOOKS_ACCESS_TOKEN_EXPIRES_AT);
+    this.accessTokenExpiry =
+      Number.isSafeInteger(expiresAt) && expiresAt > 0
+        ? new Date(expiresAt * 1000)
+        : undefined;
+    this.pendingRelayHandoffId = parsed.OAUTH_PENDING_HANDOFF_ID || undefined;
+  }
+
+  private async withRelayRefreshLock<T>(operation: () => Promise<T>): Promise<T> {
+    ensureCredentialDirectory(credentialFile);
+    const lockPath = `${credentialFile}.refresh.lock`;
+    const deadline = Date.now() + 35_000;
+    let descriptor: number | undefined;
+    while (descriptor === undefined) {
+      try {
+        descriptor = fs.openSync(lockPath, "wx", 0o600);
+      } catch (error: any) {
+        if (error?.code !== "EEXIST") throw error;
+        try {
+          if (Date.now() - fs.statSync(lockPath).mtimeMs > 60_000) {
+            fs.unlinkSync(lockPath);
+            continue;
+          }
+        } catch (statError: any) {
+          if (statError?.code !== "ENOENT") throw statError;
+          continue;
+        }
+        if (Date.now() >= deadline) {
+          throw new Error("Timed out waiting for the QuickBooks refresh lock");
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    }
+    try {
+      return await operation();
+    } finally {
+      fs.closeSync(descriptor);
+      try {
+        fs.unlinkSync(lockPath);
+      } catch {
+        // A stale-lock recovery may already have removed the lock file.
+      }
+    }
+  }
+
+  private applyRelayBundle(bundle: RelayTokenBundle): void {
+    const realmId = bundle.providerMetadata.realmId || this.realmId;
+    if (!realmId || !/^\d{3,32}$/.test(realmId)) {
+      throw new Error("OAuth relay handoff did not include a valid Realm ID");
+    }
+    this.accessToken = bundle.accessToken;
+    this.refreshToken = bundle.refreshToken;
+    this.realmId = realmId;
+    this.accessTokenExpiry = new Date(bundle.accessTokenExpiresAt * 1000);
+  }
+
+  private async persistAndAcknowledgeRelayHandoff(
+    handoffId: string,
+    bundle: RelayTokenBundle,
+  ): Promise<void> {
+    if (!this.relayClient) throw new Error("OAuth relay is not configured");
+    if (this.isSymbolicLink(credentialFile)) {
+      throw new Error(
+        "OAuth relay token state requires a regular credential file for atomic persistence",
+      );
+    }
+    this.applyRelayBundle(bundle);
+    this.pendingRelayHandoffId = handoffId;
+    this.saveTokensToEnv();
+    await this.relayClient.acknowledgeHandoff(handoffId);
+    this.pendingRelayHandoffId = undefined;
+    this.saveTokensToEnv();
+  }
+
+  private async acknowledgePendingRelayHandoff(): Promise<void> {
+    if (!this.pendingRelayHandoffId) return;
+    if (!this.relayClient) throw new Error("OAuth relay is not configured");
+    await this.relayClient.acknowledgeHandoff(this.pendingRelayHandoffId);
+    this.pendingRelayHandoffId = undefined;
+    this.saveTokensToEnv();
+  }
+
+  private relayRefreshIdempotencyKey(): string {
+    if (!this.refreshToken || !this.relayConnectionId) {
+      throw new Error("OAuth relay refresh state is incomplete");
+    }
+    return `qbo_${crypto
+      .createHash("sha256")
+      .update(`${this.relayConnectionId}:${this.refreshToken}`, "utf8")
+      .digest("hex")}`;
+  }
+
+  private async refreshAccessTokenViaRelay(): Promise<{
+    access_token: string;
+    expires_in: number;
+  }> {
+    const relayClient = this.relayClient;
+    if (!relayClient) throw new Error("OAuth relay is not configured");
+    if (this.refreshInFlight) return this.refreshInFlight;
+    this.refreshInFlight = this.withRelayRefreshLock(async () => {
+      this.reloadRelayTokenState();
+      await this.acknowledgePendingRelayHandoff();
+      if (
+        this.accessToken &&
+        this.realmId &&
+        !this.isTokenExpiredOrExpiringSoon()
+      ) {
+        return {
+          access_token: this.accessToken,
+          expires_in: Math.max(
+            1,
+            Math.floor(
+              ((this.accessTokenExpiry?.getTime() ?? Date.now()) - Date.now()) /
+                1000,
+            ),
+          ),
+        };
+      }
+
+      let handoffId: string;
+      if (!this.refreshToken || !this.realmId) {
+        const status = await relayClient.connectionStatus();
+        if (!status.handoffId) {
+          throw new Error("QuickBooks authorization is pending in the OAuth relay");
+        }
+        handoffId = status.handoffId;
+      } else {
+        handoffId = await relayClient.refresh(
+          this.refreshToken,
+          this.relayRefreshIdempotencyKey(),
+        );
+      }
+      const bundle = await relayClient.retrieveHandoff(handoffId);
+      await this.persistAndAcknowledgeRelayHandoff(handoffId, bundle);
+      return {
+        access_token: bundle.accessToken,
+        expires_in: Math.max(
+          1,
+          bundle.accessTokenExpiresAt - Math.floor(Date.now() / 1000),
+        ),
+      };
+    });
+    try {
+      return await this.refreshInFlight;
+    } finally {
+      this.refreshInFlight = undefined;
+    }
+  }
+
   async refreshAccessToken() {
+    if (this.isRelayMode()) return this.refreshAccessTokenViaRelay();
     if (!this.refreshToken) {
       await this.startOAuthFlow();
 
@@ -548,6 +795,25 @@ export class QuickbooksClient {
       try {
         if (this.isBrokerMode()) {
           this.quickbooksInstance ??= this.buildBrokerInstance();
+          return this.quickbooksInstance;
+        }
+        if (this.isRelayMode()) {
+          await this.refreshAccessTokenViaRelay();
+          if (!this.accessToken || !this.refreshToken || !this.realmId) {
+            throw new Error("OAuth relay did not provide complete QuickBooks tokens");
+          }
+          this.quickbooksInstance = new QuickBooks(
+            "relay",
+            "relay",
+            this.accessToken,
+            false,
+            this.realmId,
+            this.environment === "sandbox",
+            false,
+            null,
+            "2.0",
+            this.refreshToken,
+          );
           return this.quickbooksInstance;
         }
         if (!this.refreshToken || !this.realmId) {
@@ -660,9 +926,15 @@ export const quickbooksClient = new QuickbooksClient({
   clientSecret: client_secret,
   refreshToken: refresh_token,
   realmId: realm_id,
+  accessToken: access_token,
+  accessTokenExpiresAt: access_token_expires_at,
   environment: environment,
   redirectUri: redirect_uri,
   brokerUrl: broker_url,
   brokerConnectionId: broker_connection_id,
   brokerToken: broker_token,
+  relayUrl: oauth_relay_url,
+  relayConnectionId: oauth_connection_id,
+  relayToken: oauth_relay_token,
+  pendingRelayHandoffId: oauth_pending_handoff_id,
 });

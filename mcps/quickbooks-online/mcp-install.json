@@ -35,7 +35,8 @@
     "target": "mcp-tokens/quickbooks-online/.env"
   },
   "nextSteps": [
-    "For a customer deployment, provision QUICKBOOKS_BROKER_URL, QUICKBOOKS_CONNECTION_ID, and QUICKBOOKS_BROKER_TOKEN through the VAS broker operator.",
+    "For a new customer deployment, provision OAUTH_RELAY_URL, OAUTH_CONNECTION_ID, and OAUTH_RELAY_TOKEN through the VantaSoft OAuth Relay operator.",
+    "Keep legacy QUICKBOOKS_BROKER_* settings only until that connection is migrated through the controlled cutover.",
     "Use standalone Intuit app credentials only on an owner-controlled backend or internal profile.",
     "Reload MCP servers or restart the target Hermes gateway, then confirm the read-only QuickBooks tools are available."
   ]
